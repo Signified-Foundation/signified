@@ -3,7 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { createChallenge, createClaim, createEvidence } from "@/lib/api";
 import { articleCopy } from "@/lib/articles";
-import { meaningClaim, weightClaims } from "@/lib/session";
+import { meaningClaim } from "@/lib/session";
 import type {
   Claim,
   Evidence,
@@ -13,16 +13,19 @@ import type {
   User,
 } from "@/lib/types";
 
-type Compose = "claim" | "challenge" | "evidence" | null;
-
 type Props = {
   session: Session;
   actor: User;
   feature: Feature | null;
   claim: Claim | undefined;
   onSession: (session: Session) => void;
-  onCompose: (compose: Compose) => void;
-  compose: Compose;
+  composeClaim: boolean;
+  composeChallenge: boolean;
+  composeEvidence: boolean;
+  onComposeClaim: (open: boolean) => void;
+  onComposeChallenge: (open: boolean) => void;
+  onComposeEvidence: (open: boolean) => void;
+  onRetractChallenge?: (challengeId: number) => void;
   part?: "readings" | "evidence";
 };
 
@@ -70,8 +73,13 @@ export function ClaimBody({
   feature,
   claim,
   onSession,
-  onCompose,
-  compose,
+  composeClaim,
+  composeChallenge,
+  composeEvidence,
+  onComposeClaim,
+  onComposeChallenge,
+  onComposeEvidence,
+  onRetractChallenge,
   part = "evidence",
 }: Props) {
   const [error, setError] = useState<string | null>(null);
@@ -81,9 +89,9 @@ export function ClaimBody({
     () => ({
       author_id: actor.id,
       stance: "supports",
-      experiment_name: "Contrastive: geographic entities vs unrelated nouns",
-      notes: "Compare activation on place names versus matched unrelated nouns.",
-      condition_a_name: "geographic entities",
+      experiment_name: "Contrastive: category vs matched unrelated nouns",
+      notes: "Compare activation on the claimed category versus matched unrelated nouns.",
+      condition_a_name: "claimed category",
       condition_a_value: 0,
       condition_b_name: "unrelated nouns",
       condition_b_value: 0,
@@ -106,29 +114,9 @@ export function ClaimBody({
         text: String(form.get("text") ?? ""),
       });
       onSession(next);
-      onCompose(null);
+      onComposeClaim(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save claim");
-    } finally {
-      setPending(false);
-    }
-  }
-
-  async function onChallenge(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!claim) return;
-    const form = new FormData(event.currentTarget);
-    setPending(true);
-    setError(null);
-    try {
-      const next = await createChallenge(claim.id, {
-        author_id: actor.id,
-        alternative_text: String(form.get("alternative_text") ?? ""),
-      });
-      onSession(next);
-      onCompose(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save challenge");
     } finally {
       setPending(false);
     }
@@ -154,9 +142,33 @@ export function ClaimBody({
         intervention: form.get("intervention") === "on",
       });
       onSession(next);
-      onCompose(null);
+      onComposeEvidence(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save evidence");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function onContest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!claim) return;
+    const form = event.currentTarget;
+    const alternative_text = String(
+      new FormData(form).get("alternative_text") ?? "",
+    );
+    setPending(true);
+    setError(null);
+    try {
+      const next = await createChallenge(claim.id, {
+        author_id: actor.id,
+        alternative_text,
+      });
+      onSession(next);
+      onComposeChallenge(false);
+      form.reset();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save reading");
     } finally {
       setPending(false);
     }
@@ -165,79 +177,70 @@ export function ClaimBody({
   if (!feature) return null;
 
   const meaning = meaningClaim(session, feature.id) ?? claim;
-  const weights = weightClaims(session, feature.id);
   const support = meaning?.evidence.filter((e) => e.stance === "supports") ?? [];
   const contest = meaning?.evidence.filter((e) => e.stance === "challenges") ?? [];
-  const alternative = meaning?.challenges[0];
   const copy = articleCopy(feature.feature_id);
 
   if (part === "readings") {
+    const contests = meaning?.challenges ?? [];
     return (
-      <section id="readings" className="float-card is-read">
-        <p className="kicker">Read</p>
+      <section id="readings" className="claim-read">
+        <p className="kicker">Read · people</p>
         {meaning ? (
-          <>
+          <div className="reading-pair">
             <div className="reading">
               <p className="reading-who">
-                {nameOf(session.users, meaning.author_id)} · a reading, not a fact
+                {nameOf(session.users, meaning.author_id)}, a person · a
+                reading, not a fact
               </p>
               <p>{copy.claim ?? meaning.text}</p>
             </div>
-            {alternative && (
-              <div className="reading">
-                <p className="reading-who">
-                  {nameOf(session.users, alternative.author_id)} · contest
-                </p>
-                <p>{copy.contest ?? alternative.alternative_text}</p>
-              </div>
-            )}
-            {alternative && (
-              <p className="section-note">
-                Both remain. Neither has been retired.
-              </p>
-            )}
-          </>
-        ) : (
-          <p>
-            No reading has been proposed. The graph is an observation. A reading
-            begins when someone says what they think this unit is doing.
-          </p>
-        )}
-        {weights.length > 0 && (
-          <div className="reading-weights">
-            {weights.map((item) => (
+            {contests.map((item) => (
               <div className="reading" key={item.id}>
                 <p className="reading-who">
-                  {nameOf(session.users, item.author_id)} · local reading, not a
-                  measurement
+                  {nameOf(session.users, item.author_id)}, a person · another
+                  reading
                 </p>
-                <p>{item.text}</p>
+                <p>{item.alternative_text}</p>
+                {item.author_id === actor.id && onRetractChallenge && (
+                  <button
+                    type="button"
+                    className="comment-reply"
+                    onClick={() => onRetractChallenge(item.id)}
+                  >
+                    Retract
+                  </button>
+                )}
               </div>
             ))}
           </div>
+        ) : (
+          <p>
+            No reading has been proposed. The graph is an observation. A person
+            has to say what they think this unit is doing.
+          </p>
         )}
         <div className="actions">
-          {!meaning && (
+          {!meaning ? (
             <button
               type="button"
               className="text-link"
-              onClick={() => onCompose("claim")}
+              onClick={() => onComposeClaim(true)}
             >
-              Propose a reading
+              File a reading as {actor.name}
             </button>
-          )}
-          {meaning && (
+          ) : (
             <button
               type="button"
               className="text-link"
-              onClick={() => onCompose("challenge")}
+              onClick={() => onComposeChallenge(true)}
             >
-              Add another reading
+              File another reading as {actor.name}
             </button>
           )}
         </div>
         {error && <p className="form-error">{error}</p>}
-        {compose === "claim" && (
+        {composeClaim && (
           <form className="compose" onSubmit={onClaim}>
             <label>
               Interpretation
@@ -256,15 +259,15 @@ export function ClaimBody({
               <button
                 className="text-link"
                 type="button"
-                onClick={() => onCompose(null)}
+                onClick={() => onComposeClaim(false)}
               >
                 Cancel
               </button>
             </div>
           </form>
         )}
-        {compose === "challenge" && meaning && (
-          <form className="compose" onSubmit={onChallenge}>
+        {composeChallenge && meaning && (
+          <form className="compose" onSubmit={onContest}>
             <label>
               Alternative reading
               <textarea
@@ -282,7 +285,7 @@ export function ClaimBody({
               <button
                 className="text-link"
                 type="button"
-                onClick={() => onCompose(null)}
+                onClick={() => onComposeChallenge(false)}
               >
                 Cancel
               </button>
@@ -313,9 +316,9 @@ export function ClaimBody({
               <button
                 type="button"
                 className="text-link"
-                onClick={() => onCompose("evidence")}
+                onClick={() => onComposeEvidence(true)}
               >
-                Attach evidence
+              Attach evidence as {actor.name}
               </button>
             </div>
           </>
@@ -323,7 +326,7 @@ export function ClaimBody({
           <p className="quiet">Evidence attaches to a reading.</p>
         )}
         {error && <p className="form-error">{error}</p>}
-        {compose === "evidence" && claim && (
+        {composeEvidence && claim && (
           <form className="compose" onSubmit={onEvidence}>
             <p>
               Store a numerical result. Do not attach an explanation from
@@ -403,7 +406,7 @@ export function ClaimBody({
               <button
                 className="text-link"
                 type="button"
-                onClick={() => onCompose(null)}
+                onClick={() => onComposeEvidence(false)}
               >
                 Cancel
               </button>

@@ -34,6 +34,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+em,
+i:not(.status) {
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 button,
 input,
 select,
@@ -64,6 +73,31 @@ a {
 .wiki {
   min-height: 100vh;
   padding: 28px 48px 72px;
+}
+
+.wiki.is-paper {
+  background: #fff;
+}
+
+.wiki.is-field {
+  --mute: #2a4a32;
+  --rule: #4e8a56;
+  --second: #1c3d28;
+  background: var(--types);
+}
+
+.wiki.is-field ::selection {
+  background: #c8ecc6;
+}
+
+.wiki.is-field .mast-nav a,
+.wiki.is-field .toc a {
+  color: #1c3d28;
+}
+
+.wiki.is-field .mast-nav a[aria-current="page"],
+.wiki.is-field .toc a[aria-current="page"] {
+  color: var(--ink);
 }
 
 .mast {
@@ -113,8 +147,8 @@ a {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(15rem, 36%);
   gap: 48px;
-  align-items: end;
-  min-height: calc(100vh - 168px);
+  align-items: center;
+  min-height: calc(100vh - 120px);
   padding: 5vh 0 2vh;
 }
 
@@ -124,7 +158,7 @@ a {
 }
 
 .front-id {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -138,6 +172,7 @@ a {
 }
 
 .front-title {
+  margin: 0;
   font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: clamp(36px, 5vw, 60px);
   font-weight: 400;
@@ -146,11 +181,9 @@ a {
   text-wrap: pretty;
 }
 
-
-
-
 .front-subtitle {
   margin-top: 1rem;
+  max-width: 38rem;
   font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: clamp(22px, 3vw, 36px);
   font-weight: 400;
@@ -159,22 +192,63 @@ a {
   text-wrap: pretty;
 }
 
-
-.front-subtitle-books {
-  /* display: flex;  
-  display: inline-block;*/
-  margin-left: 0.2rem;
+.front-why {
+  margin: 1.15rem 0 0;
+  max-width: 36rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: clamp(17px, 1.5vw, 20px);
+  font-style: italic;
+  line-height: 1.45;
+  text-wrap: pretty;
 }
 
-.front-subtitle-books img {
-  width: 3rem;
-  height: 2rem;
-  border-radius: 0.5rem;
-  /* object-fit: contain;  */
+.front-acts {
+  margin: 1.35rem 0 1.6rem;
+  max-width: 36rem;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.55;
+  text-wrap: pretty;
 }
 
-.front-a,
-.front-b {
+.front-chip {
+  display: inline-block;
+  width: 3.1rem;
+  height: 2.05rem;
+  margin: 0 0.15em;
+  overflow: hidden;
+  border-radius: 2px;
+  vertical-align: -0.28em;
+}
+
+.front-acts img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(2.8);
+}
+
+.front-acts img.is-observe {
+  object-position: 22% 58%;
+}
+
+.front-acts img.is-interpret {
+  object-position: 48% 12%;
+}
+
+.front-acts img.is-debate {
+  object-position: 88% 48%;
+}
+
+.front-stage > .front-go {
+  display: inline-block;
+}
+
+.front-a {
+  margin-bottom: 0.55em;
   font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: clamp(16px, 1.2vw, 20px);
   font-weight: 400;
@@ -183,12 +257,32 @@ a {
   text-wrap: pretty;
 }
 
-.front-a {
-  margin-bottom: 1.1em;
+.front-b {
+  max-width: 34em;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.0625rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.45;
+  color: var(--second);
 }
 
-.front-b {
-  color: var(--second);
+.front-hold {
+  margin-top: 1.15em;
+  color: var(--mute);
+  font-family: var(--font-body), "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+.front-prompt {
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--mute);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -199,18 +293,6 @@ a {
       opacity: 0;
     }
   }
-}
-
-.front-hold {
-  margin-top: 2em;
-  color: var(--mute);
-  font-size: 15px;
-}
-
-.front-prompt {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
-  font-size: 13px;
-  color: var(--mute);
 }
 
 .front-prompt .output {
@@ -234,11 +316,14 @@ a {
 
 .front-prompts {
   display: grid;
-  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 32px;
 }
 
 .front-prompt-model {
   display: block;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-style: normal;
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -248,7 +333,19 @@ a {
 
 .front-entry .front-go {
   display: inline-block;
-  margin-top: 1.1rem;
+  margin-top: 0.85rem;
+  font-size: 13px;
+  color: var(--mute);
+}
+
+.front-second {
+  margin-top: 48px;
+  padding-top: 36px;
+  border-top: 1px solid var(--rule);
+}
+
+.front-second .front-foot {
+  margin-bottom: 40px;
 }
 
 .front-entries {
@@ -260,8 +357,7 @@ a {
   border-top: 1px solid var(--rule);
 }
 
-.front-entries .front-a,
-.front-entries .front-b {
+.front-entries .front-a {
   font-size: clamp(22px, 2.4vw, 30px);
 }
 
@@ -295,7 +391,7 @@ a {
   gap: 12px;
   padding: 0.35rem 0;
   border-top: 1px solid var(--rule);
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
 }
 
@@ -306,7 +402,7 @@ a {
 
 .run-model {
   margin: 0.35rem 0 0.7rem;
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -394,7 +490,7 @@ a {
 }
 
 .shelf-label {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -427,8 +523,31 @@ a {
   margin: 0 0 1rem;
 }
 
-.front-does > p {
+.does-chapter {
+  margin-top: 2.8rem;
+}
+
+.does-chapter:first-child {
+  margin-top: 0;
+}
+
+.does-chapter p {
   max-width: 38rem;
+}
+
+.does-chapter p + p {
+  margin-top: 0.85rem;
+}
+
+.front-signal {
+  margin: 2.8rem 0 0;
+  max-width: 28rem;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-size: clamp(22px, 2.6vw, 32px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.22;
+  text-wrap: pretty;
 }
 
 .does-list {
@@ -447,7 +566,7 @@ a {
 
 .does-list strong {
   display: block;
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.14em;
@@ -490,7 +609,7 @@ a {
 }
 
 .spread-prompt {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 13px;
   color: var(--mute);
   margin-bottom: 12px;
@@ -542,7 +661,7 @@ a {
 }
 
 .toc-label {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -587,7 +706,7 @@ a {
 }
 
 .kicker {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -610,8 +729,24 @@ a {
   max-width: 38rem;
 }
 
-.reading {
-  margin: 1.1rem 0 1.5rem;
+.reading-pair {
+  display: grid;
+  gap: 0.2rem 2rem;
+}
+
+.reading-pair .reading {
+  margin: 0.6rem 0 0.85rem;
+}
+
+@media (min-width: 720px) {
+  .reading-pair {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.atlas-empty {
+  margin: 0.7rem 0 0;
+  color: var(--mute);
 }
 
 .reading-who {
@@ -667,7 +802,7 @@ figcaption {
 }
 
 .banner-run {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -677,7 +812,7 @@ figcaption {
 
 .banner-legend {
   margin: 0;
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: clamp(15px, 2vw, 18px);
   line-height: 1.35;
   color: var(--ink);
@@ -729,7 +864,7 @@ figcaption {
 .home-pair cite {
   display: block;
   font-style: normal;
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -780,7 +915,7 @@ figcaption {
 }
 
 .prompt {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 13px;
   color: var(--mute);
   margin: 1.6rem 0 0;
@@ -810,7 +945,7 @@ figcaption {
 }
 
 .spread-id {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -911,6 +1046,10 @@ button.text-link {
   max-width: 16.5rem;
 }
 
+.graph-stage .graph-wrap {
+  max-width: none;
+}
+
 .graph {
   width: 100%;
   height: auto;
@@ -942,16 +1081,30 @@ button.text-link {
   fill: var(--ink);
 }
 
+.graph-node.is-selected .graph-label,
+.graph-node.is-selected .graph-meta {
+  fill: var(--ink);
+}
+
+.graph-edge {
+  stroke: var(--ink);
+  stroke-opacity: 0.16;
+}
+
+.graph-edge.is-hot {
+  stroke-opacity: 0.42;
+}
+
 .graph-label,
 .graph-meta {
   fill: var(--ink);
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
-  font-size: 9px;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-size: 11px;
 }
 
 .graph-meta {
   fill: var(--mute);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .graph-weight {
@@ -980,12 +1133,12 @@ button.text-link {
 }
 
 .graph-weight em {
-  font-style: normal;
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-style: italic;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
   color: var(--ink);
-  letter-spacing: 0;
+  letter-spacing: -0.02em;
   text-transform: none;
-  font-size: 12px;
+  font-size: 1.05rem;
 }
 
 .graph-weight input[type="range"] {
@@ -999,6 +1152,41 @@ button.text-link {
   font-size: 12px;
   font-style: italic;
   line-height: 1.4;
+}
+
+.graph-weight-lead {
+  margin: 0;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--mute);
+}
+
+.graph-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 1.15rem;
+}
+
+.graph-words button {
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--mute);
+  padding: 0;
+  box-shadow: inset 0 -1px 0 transparent;
+  transition:
+    color 160ms var(--ease-out),
+    box-shadow 160ms var(--ease-out);
+}
+
+.graph-words button.is-active {
+  color: var(--ink);
+  box-shadow: inset 0 -1px 0 var(--ink);
+}
+
+.graph-words button:active {
+  transform: scale(0.97);
 }
 
 .graph-dot.is-contested {
@@ -1050,7 +1238,7 @@ button.text-link {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
 }
 
 .ratio strong {
@@ -1160,20 +1348,123 @@ button.text-link {
   font-size: 13px;
 }
 
-.comments {
-  list-style: none;
-  margin: 0 0 10px;
+.talk-readings {
+  margin: 0 0 1.35rem;
+  padding-bottom: 1.15rem;
+  border-bottom: 1px solid var(--rule);
 }
 
-.comments li {
-  padding: 7px 0;
-  border-bottom: 1px solid var(--rule);
+.talk-readings .reading {
+  margin: 0.85rem 0 0;
+}
+
+.talk-readings .reading + .reading {
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--rule);
+}
+
+.talk-readings .section-note,
+.talk-readings .actions {
+  margin-top: 0.75rem;
+}
+
+.talk-readings .compose {
+  margin-top: 0.75rem;
+}
+
+.talk-thread {
+  margin-top: 0.4rem;
+}
+
+.thread {
+  list-style: none;
+  margin: 0.4rem 0 1rem;
+}
+
+.thread-item {
+  padding: 0.85rem 0 0.35rem;
+  border-top: 1px solid var(--rule);
+}
+
+.thread > .thread-item:first-child {
+  border-top: 0;
+  padding-top: 0.2rem;
+}
+
+.thread.is-nested {
+  margin: 0.45rem 0 0.2rem;
+  padding-left: 1.1rem;
+  border-left: 2px solid var(--rule);
+}
+
+.thread.is-nested .thread-item {
+  border-top: 0;
+  padding-top: 0.65rem;
+}
+
+.thread-who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.45rem;
+  margin: 0 0 0.35rem;
+  font-size: 13px;
+  color: var(--mute);
+}
+
+.thread-who strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.thread-who span + span::before {
+  content: "·";
+  margin-right: 0.45rem;
+  color: var(--mute);
+}
+
+.thread-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  max-width: 42rem;
+}
+
+.thread-item .comment-form {
+  margin-top: 0.65rem;
 }
 
 .comments li p {
   font-size: 14px;
   line-height: 1.4;
   max-width: 42rem;
+}
+
+.comments.is-nested {
+  margin: 0.35rem 0 0.15rem 0.15rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--rule);
+}
+
+.comment-reply {
+  margin: 0.15rem 0 0.4rem;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--mute);
+  transition: color 160ms var(--ease-out);
+}
+
+.comment-reply:active {
+  transform: scale(0.97);
+}
+
+.comment-replying {
+  margin: 0;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--mute);
 }
 
 .comment-meta {
@@ -1242,7 +1533,7 @@ button.text-link {
 
 .boot-pre {
   margin-top: 16px;
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 13px;
   line-height: 1.6;
   color: var(--mute);
@@ -1301,6 +1592,7 @@ button.text-link {
   .front-hero,
   .front-lower,
   .front-entries,
+  .front-prompts,
   .does-list,
   .spread-pages,
   .explore,
@@ -1328,8 +1620,7 @@ button.text-link {
     padding-left: 20px;
   }
 
-  .front-a,
-  .front-b {
+  .front-a {
     font-size: clamp(26px, 8.4vw, 36px);
   }
 
@@ -1515,7 +1806,7 @@ button.text-link {
 }
 
 .blog-nav-label {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 10px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1537,7 +1828,7 @@ button.text-link {
 }
 
 .blog-kind-num {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.08em;
   color: color-mix(in srgb, var(--blog-ink) 55%, var(--blog-field));
@@ -1588,7 +1879,7 @@ button.text-link {
 .blog-kind-ex span {
   display: inline-block;
   margin-right: 0.4em;
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1680,24 +1971,43 @@ button.text-link {
 }
 
 .folio {
-  --cream: #f6f1e8;
+  --cream: #fff;
   --mark: #edd5c0;
   min-height: 100vh;
   min-height: 100dvh;
   padding: 22px 32px 80px;
   color: var(--ink);
-  background: var(--cream);
+  background: #fff;
 }
 
+.folio.is-paper,
 .folio.is-issue {
-  background: var(--cream);
+  background: #fff;
+}
+
+.folio.is-field {
+  --cream: var(--types);
+  --mark: #c8ecc6;
+  --mute: #2a4a32;
+  --rule: #4e8a56;
+  --second: #1c3d28;
+  background: var(--types);
+}
+
+.folio.is-field ::selection {
+  background: #c8ecc6;
 }
 
 .folio-mast {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 24px;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+
+.mast-actors {
+  margin-left: auto;
 }
 
 .folio-head {
@@ -1706,7 +2016,7 @@ button.text-link {
 }
 
 .folio-issue {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1716,36 +2026,190 @@ button.text-link {
 
 .folio-title {
   margin: 0;
-  font-family: var(--font-body), "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: clamp(2.35rem, 5.2vw, 3.55rem);
-  font-weight: 700;
-  letter-spacing: -0.045em;
+  font-weight: 400;
+  letter-spacing: -0.03em;
   line-height: 0.98;
   text-wrap: pretty;
 }
 
 .folio-by {
   margin: 0.55rem 0 1.15rem;
-  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
   font-size: clamp(1.2rem, 2vw, 1.45rem);
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.02em;
 }
 
+.folio-by-kind {
+  font-size: 0.72em;
+  letter-spacing: 0;
+  color: var(--mute);
+}
+
 .folio-dek {
   margin: 0;
   max-width: 36rem;
   padding-left: 16%;
-  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 1.12rem;
   line-height: 1.55;
   text-wrap: pretty;
 }
 
+.folio-run {
+  margin: 0 0 1rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--mute);
+}
+
+.folio-run .output {
+  margin-left: 0.35em;
+  color: var(--ink);
+  box-shadow: inset 0 -1px 0 var(--ink);
+}
+
+.run-did {
+  margin: 0 0 1.8rem;
+  padding-bottom: 1.6rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.run-did-model,
+.run-did-note {
+  margin: 0 0 0.85rem;
+  max-width: 42rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.02rem;
+  font-style: italic;
+  color: var(--mute);
+}
+
+.run-did-line {
+  display: grid;
+  grid-template-columns: 4.2rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: baseline;
+  margin: 0 0 0.45rem;
+  max-width: 42rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.2rem;
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--mute);
+}
+
+.run-did-line span {
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.run-did-line.is-wrote {
+  color: var(--ink);
+}
+
+.run-did-note {
+  margin: 0.85rem 0 0;
+  font-size: 0.98rem;
+}
+
+.person-does {
+  margin: 0 0 2rem;
+}
+
+.person-does-who {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-style: italic;
+  color: var(--mute);
+}
+
+.person-does ol {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  max-width: 42rem;
+}
+
+.person-does li {
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+
+.person-does a {
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: inset 0 -1px 0 var(--ink);
+}
+
+.graph-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  list-style: none;
+  margin: 0 0 0.7rem;
+  font-family: var(--font-body), "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--mute);
+}
+
+.graph-key li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.graph-key li::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ink) 22%, transparent);
+}
+
+.graph-key .is-feature::before {
+  background: var(--ink);
+}
+
+.graph-key .is-output::before {
+  background: color-mix(in srgb, var(--ink) 55%, transparent);
+}
+
+.folio-note {
+  margin: 1.15rem 0 0;
+  max-width: 36rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.02rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--second);
+}
+
+.folio-note span {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
 .folio-essay,
 .issue {
-  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 1.125rem;
   line-height: 1.65;
 }
@@ -1763,7 +2227,7 @@ button.text-link {
 .folio-dek,
 .issue-obs,
 .issue-note {
-  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
 }
 
 .mark {
@@ -1790,8 +2254,244 @@ button.text-link {
   padding-top: 2.6rem;
 }
 
+.folio-stage.is-single,
+.issue-stage.is-single {
+  display: block;
+  max-width: 58rem;
+  margin-inline: auto;
+}
+
+.folio-stage.is-single .folio-essay {
+  max-width: none;
+  padding-right: 0;
+}
+
+.graph-stage {
+  margin: 0 0 2.4rem;
+}
+
+.graph-stage .kicker {
+  margin-bottom: 0.65rem;
+}
+
+.claim-read {
+  margin: 0 0 2rem;
+}
+
+.claim-read .kicker {
+  margin-bottom: 0.45rem;
+}
+
+.atlas {
+  margin: 0 0 3.2rem;
+}
+
+.atlas-bar {
+  display: grid;
+  gap: 0.85rem;
+  margin-bottom: 1.1rem;
+}
+
+.atlas-search {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.atlas-search span {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.atlas-search input {
+  width: 100%;
+  max-width: 28rem;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  background: transparent;
+  padding: 0.35rem 0 0.5rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.45rem;
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+
+.atlas-search input::placeholder {
+  color: color-mix(in srgb, var(--mute) 70%, transparent);
+}
+
+.atlas-runs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+}
+
+.atlas-runs button {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--mute);
+  transition: color 160ms var(--ease-out);
+}
+
+.atlas-runs button.is-active {
+  color: var(--ink);
+}
+
+.atlas-runs button:active {
+  transform: scale(0.97);
+}
+
+.atlas-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: color-mix(in srgb, #fff 28%, transparent);
+}
+
+.atlas-edge {
+  stroke: var(--ink);
+  stroke-width: 1;
+  stroke-opacity: 0.12;
+}
+
+.atlas-edge.is-dim {
+  stroke-opacity: 0.04;
+}
+
+.atlas-node {
+  cursor: pointer;
+}
+
+.atlas-node:focus-visible {
+  outline: none;
+}
+
+.atlas-node:focus-visible circle {
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.atlas-node circle {
+  fill: #1c3d28;
+  stroke: none;
+}
+
+.atlas-node.is-contested circle {
+  fill: var(--ink);
+}
+
+.atlas-node.is-unresolved circle,
+.atlas-node.is-supported circle {
+  fill: #1c3d28;
+}
+
+.atlas-node.is-none circle {
+  fill: transparent;
+  stroke: var(--ink);
+  stroke-width: 1.2;
+}
+
+.atlas-node.is-selected circle {
+  fill: var(--ink);
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.atlas-node text {
+  fill: var(--ink);
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  pointer-events: none;
+}
+
+.atlas-node.is-dim {
+  opacity: 0.16;
+}
+
+.atlas-caption {
+  margin: 0.7rem 0 0;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--mute);
+}
+
+.atlas-empty {
+  margin: 0.55rem 0 0;
+  color: var(--mute);
+}
+
+.atlas-card {
+  margin-top: 1.6rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--rule);
+}
+
+.atlas-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.atlas-card h2 {
+  margin: 0 0 0.85rem;
+}
+
+.atlas-index {
+  list-style: none;
+  display: grid;
+  gap: 1.6rem;
+  margin: 0;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--rule);
+}
+
+.atlas-index-run {
+  margin: 0 0 0.45rem;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.atlas-index-run span {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--second);
+}
+
+.atlas-index ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.15rem;
+}
+
+.atlas-index a.is-approved {
+  color: var(--ink);
+}
+
+.atlas-index a.is-loading {
+  color: var(--mute);
+}
+
+.atlas-index .status {
+  margin-left: 0.4em;
+  font-size: 11px;
+}
+
 .issue-prompt {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 13px;
   color: var(--mute);
   margin: 0 0 2.6rem;
@@ -1845,7 +2545,7 @@ button.text-link {
 }
 
 .issue-num {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 12px;
   letter-spacing: 0.08em;
   color: var(--mute);
@@ -1853,7 +2553,7 @@ button.text-link {
 }
 
 .issue-kicker {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1904,7 +2604,7 @@ button.text-link {
 .issue-pair cite {
   display: block;
   font-style: normal;
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1951,7 +2651,7 @@ button.text-link {
 }
 
 .issue-facts dt {
-  font-family: var(--font-mono), "Geist Mono", ui-monospace, Menlo, monospace;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1966,7 +2666,7 @@ button.text-link {
 
 .folio-stage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 20.5rem;
+  grid-template-columns: minmax(0, 1fr) 22.5rem;
   gap: 2.2rem 3.2rem;
   align-items: start;
   max-width: 74rem;
@@ -1992,7 +2692,7 @@ button.text-link {
 
 .folio-toc .toc-label {
   margin: 0 0 0.45rem;
-  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
   font-style: italic;
   font-size: 1.05rem;
   font-weight: 400;
@@ -2018,8 +2718,12 @@ button.text-link {
   transition: color 160ms var(--ease-out);
 }
 
-.folio.is-types .folio-toc a {
-  color: #f4fff4;
+.folio.is-field .folio-toc a {
+  color: #1c3d28;
+}
+
+.folio.is-field .mast-nav a {
+  color: #1c3d28;
 }
 
 .float-rail {
@@ -2027,12 +2731,14 @@ button.text-link {
   top: 1.15rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  width: 20.5rem;
+  gap: 0.65rem;
+  width: 22.5rem;
   align-self: start;
   z-index: 2;
-  max-height: calc(100dvh - 2.4rem);
-  overflow: auto;
+}
+
+.float-rail .graph-wrap {
+  max-width: none;
 }
 
 .float-card.is-read .reading {
@@ -2061,18 +2767,42 @@ button.text-link {
   background: #fff;
   color: var(--ink);
   width: 100%;
-  padding: 1.05rem 1.15rem 1.15rem;
+  padding: 0.9rem 1.05rem 1rem;
   border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
 }
 
-.folio.is-types .float-card {
+.folio.is-field .float-card {
   --paper: #fff;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.folio.is-paper .float-card {
+  --paper: var(--types);
+  --mute: #2a4a32;
+  --rule: #4e8a56;
+  --second: #1c3d28;
+  background: var(--types);
+  border-color: #4e8a56;
+}
+
+.folio.is-paper .float-card .compose textarea,
+.folio.is-paper .float-card .compose input {
+  background: #fff;
+  border-color: #4e8a56;
+}
+
+.folio.is-paper .float-card .graph-node.is-token circle {
+  fill: color-mix(in srgb, var(--ink) 8%, var(--types));
+}
+
+.folio.is-paper .float-card .graph-node.is-output circle {
+  fill: color-mix(in srgb, var(--ink) 14%, var(--types));
 }
 
 .float-rail .kicker,
 .float-card .kicker {
   margin: 0 0 0.5rem;
-  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
   font-style: italic;
   font-size: 1.05rem;
   font-weight: 400;
@@ -2106,7 +2836,7 @@ button.text-link {
 
 .float-card .reading-who {
   margin: 0 0 0.35rem;
-  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
   font-style: italic;
   font-size: 0.95rem;
   letter-spacing: -0.02em;
@@ -2122,7 +2852,7 @@ button.text-link {
 }
 
 .float-card .prompt .output {
-  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
   font-style: italic;
   color: var(--ink);
 }
@@ -2163,7 +2893,7 @@ button.text-link {
 }
 
 .float-card .graph-weight em {
-  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
   font-style: italic;
   font-size: 13px;
 }
@@ -2187,7 +2917,7 @@ button.text-link {
 
 .float-card .compose label,
 .float-card .compose .check {
-  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
   font-style: italic;
   letter-spacing: -0.02em;
 }
@@ -2206,8 +2936,16 @@ button.text-link {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .folio.is-types .mast-nav a:hover,
-  .folio-toc a:hover {
+  .folio.is-field .mast-nav a:hover,
+  .folio.is-field .folio-toc a:hover {
+    color: var(--ink);
+  }
+
+  .folio-toc a:hover,
+  .comment-reply:hover,
+  .atlas-runs button:hover,
+  .atlas-index a:hover,
+  .person-does a:hover {
     color: var(--ink);
   }
 }
@@ -2241,6 +2979,5 @@ button.text-link {
     position: static;
     order: -1;
     width: 100%;
-    max-height: none;
   }
 }

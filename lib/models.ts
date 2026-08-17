@@ -42,6 +42,12 @@ export const MODELS: Model[] = [
     slug: "qwen/qwen3.6-27b",
     role: "scorer",
   },
+  {
+    id: 8,
+    name: "ALLaM 2 7B",
+    slug: "allam-2-7b",
+    role: "writer",
+  },
 ];
 
 export const RUNS: Run[] = [
@@ -100,6 +106,13 @@ export const RUNS: Run[] = [
     prompt: PANOPTICON.prompt,
     output: PANOPTICON.output,
     created_at: "2026-08-17T16:20:00.000Z",
+  },
+  {
+    id: 9,
+    model_id: 8,
+    prompt: "Sing, goddess, the wrath of",
+    output: "Achilles",
+    created_at: "2026-08-17T12:08:00.000Z",
   },
 ];
 

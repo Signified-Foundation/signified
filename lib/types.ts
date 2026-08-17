@@ -81,6 +81,7 @@ export type Comment = {
   id: number;
   feature_pk: number;
   author_id: number;
+  parent_id: number | null;
   text: string;
   created_at: string;
 };
@@ -120,11 +121,22 @@ export type Score = {
   notes: string;
 };
 
+/** A person's vote on a response. Points at runs, never at a feature. */
+export type Choice = {
+  id: number;
+  author_id: number;
+  prompt: string;
+  chosen_run_id: number;
+  among_run_ids: number[];
+  created_at: string;
+};
+
 export type Session = {
   models: Model[];
   runs: Run[];
   graphs: Record<number, GraphPayload>;
   scores: Score[];
+  choices: Choice[];
   observation: { id: number; graph_path: string };
   users: User[];
   features: Feature[];

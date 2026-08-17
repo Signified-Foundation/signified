@@ -4,7 +4,7 @@ A wiki of contested readings of what happens inside models, and of how those rea
 
 Interpretations stay claims. Evidence stays numbers. Talk is for people, not proof. The article does not pick a winner. Graphs are made elsewhere (Colab / `circuit-tracer`); this site holds the argument.
 
-Type: **Montaga** for lemmas and claims, **Geist** for prose, **Geist Mono** for tokens and measurements.
+Type: **Montaga** for titles and roman serif, **Newsreader** for italics. No mono.
 
 ## Run
 
@@ -19,9 +19,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Pages
 
-- `/` — landing: two readings, then the other articles on this run
+- `/` — landing: several contested entries, then the rest by run
 - `/wiki` — article index
-- `/wiki/feature-18472` — the Canberra article (live claims, evidence, and talk)
+- `/wiki/feature-3102` — Georgia (country versus state)
 - `/wiki/method` — how a reading is held
 - `/blog/types` — the five kinds of object the wiki holds
 
@@ -31,4 +31,4 @@ The Colab notebook in `notebooks/` is the measurement workshop. It is not the we
 
 This repo is a Next.js app at the root. Connect it to Vercel and deploy. Do not set a subdirectory as the root.
 
-Edits you make on the live site stay in that browser. They are not shared. The seeded Canberra argument ships with the site.
+Edits you make on the live site stay in that browser. They are not shared. The seeded arguments ship with the site.

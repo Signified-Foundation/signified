@@ -3,12 +3,15 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { ClaimBody } from "@/components/ClaimBody";
+import { CompletionsChoice } from "@/components/CompletionsChoice";
 import { FolioMast } from "@/components/FolioMast";
 import { GraphSchematic } from "@/components/GraphSchematic";
 import { Talk } from "@/components/Talk";
 import { articleCopy, inspectCopy, neighborSentence } from "@/lib/articles";
-import { CATALOG } from "@/lib/catalog";
-import { createClaim, getSession } from "@/lib/api";
+import { CATALOG, articleGround, folioGroundClass } from "@/lib/catalog";
+import { loadActorId, saveActorId } from "@/lib/actor";
+import { createClaim, getSession, retractChallenge, retractComment } from "@/lib/api";
+import { wordFor } from "@/lib/reading";
 import {
   graphOf,
   meaningClaim,
@@ -16,37 +19,15 @@ import {
   runOf,
   weightClaims,
   writerNameOf,
+  writerRunsForPrompt,
 } from "@/lib/session";
 import type { GraphNode, Session, User } from "@/lib/types";
 import { featureSlug } from "@/lib/wiki";
 
 function kindLabel(node: GraphNode) {
-  if (node.kind === "feature") return "Feature";
-  if (node.kind === "output") return "Output token";
-  return "Prompt token";
-}
-
-const PAGE_TOC = [
-  { href: "#observation", label: "On this run" },
-  { href: "#attribution", label: "Attribution" },
-  { href: "#readings", label: "Readings" },
-  { href: "#evidence", label: "Evidence" },
-  { href: "#talk", label: "Talk" },
-] as const;
-
-function FolioToc() {
-  return (
-    <nav className="folio-toc" aria-label="On this page">
-      <p className="toc-label">On this page</p>
-      <ul>
-        {PAGE_TOC.map((item) => (
-          <li key={item.href}>
-            <a href={item.href}>{item.label}</a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
+  if (node.kind === "feature") return "Internal unit · not a word the model wrote";
+  if (node.kind === "output") return "Output token · the model wrote this";
+  return "Prompt token · given to the model";
 }
 
 function markedDek(about: string, pull: string): ReactNode {
@@ -68,16 +49,23 @@ function markedDek(about: string, pull: string): ReactNode {
 
 export function Article({ featureId }: { featureId: number }) {
   const entry = CATALOG.find((item) => item.id === featureId);
+  const ground = articleGround(entry);
+  const folioClass = folioGroundClass(ground);
   const [session, setSession] = useState<Session | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [actorId, setActorId] = useState(1);
   const [selectedNode, setSelectedNode] = useState<string | null>(
     `feat-${featureId}`,
   );
-  const [compose, setCompose] = useState<
-    "claim" | "challenge" | "evidence" | null
-  >(null);
+  const [composeClaim, setComposeClaim] = useState(false);
+  const [composeChallenge, setComposeChallenge] = useState(false);
+  const [composeEvidence, setComposeEvidence] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
+
+  function setActor(id: number) {
+    setActorId(id);
+    saveActorId(id);
+  }
 
   useEffect(() => {
     setSelectedNode(`feat-${featureId}`);
@@ -87,7 +75,9 @@ export function Article({ featureId }: { featureId: number }) {
     let alive = true;
     getSession()
       .then((data) => {
-        if (alive) setSession(data);
+        if (!alive) return;
+        setSession(data);
+        setActorId(loadActorId(data.users.map((user) => user.id)));
       })
       .catch(() => {
         if (alive) {
@@ -106,8 +96,7 @@ export function Article({ featureId }: { featureId: number }) {
   const graph = feature && session ? graphOf(session, feature.run_id) : undefined;
   const writer = feature && session ? writerNameOf(session, feature.run_id) : undefined;
   const claim = feature && session ? meaningClaim(session, feature.id) : undefined;
-  const selected =
-    graph?.nodes.find((n) => n.id === selectedNode) ?? null;
+  const selected = graph?.nodes.find((n) => n.id === selectedNode) ?? null;
   const copy = articleCopy(featureId);
   const byline = [entry?.left.by, entry?.right?.by].filter(Boolean).join(" and ");
   const issue = String(CATALOG.findIndex((item) => item.id === featureId) + 1).padStart(
@@ -134,6 +123,119 @@ export function Article({ featureId }: { featureId: number }) {
     return map;
   }, [session, feature]);
 
+  async function saveReading(nodeId: string, weight: number) {
+    if (!session || !actor) return;
+    const target = session.features.find((item) => item.node_id === nodeId);
+    if (!target) return;
+    const word = wordFor(weight);
+    setPendingSave(true);
+    setError(null);
+    try {
+      const next = await createClaim({
+        feature_pk: target.id,
+        author_id: actor.id,
+        kind: "weight",
+        weight,
+        text: `On this run I weigh Feature ${target.feature_id} as ${word}.`,
+      });
+      setSession(next);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save weight");
+    } finally {
+      setPendingSave(false);
+    }
+  }
+
+  const contests = claim?.challenges ?? [];
+  const siblingWriters =
+    session && run ? writerRunsForPrompt(session, run.prompt) : [];
+  const canChoose = siblingWriters.length >= 2;
+
+  const head = (
+    <header className="folio-head">
+      <p className="folio-issue">
+        {issue} / {copy.title}
+        {writer ? ` · ${writer}` : ""}
+        {claim && contests.length > 0
+          ? " · two readings"
+          : claim
+            ? " · one reading"
+            : " · no reading yet"}
+      </p>
+      <h1 className="folio-title">{entry?.lemma ?? copy.title}</h1>
+      {byline && (
+        <p className="folio-by">
+          {byline} <span className="folio-by-kind">· people, not the model</span>
+        </p>
+      )}
+      <p className="folio-dek">{markedDek(copy.about, copy.pull)}</p>
+    </header>
+  );
+
+  const runDid =
+    run && graph ? (
+      <section className="run-did" aria-label="What the model did">
+        <p className="kicker">What the model did</p>
+        <p className="run-did-model">
+          {writer ?? "The writer"} completed the prompt. It did not label the
+          graph, and it did not file a reading.
+        </p>
+        <p className="run-did-line">
+          <span>Given</span>
+          {graph.prompt_tokens.join("")}
+        </p>
+        <p className="run-did-line is-wrote">
+          <span>Wrote</span>
+          {run.output}
+        </p>
+        <p className="run-did-note">
+          The graph on the right is a measurement of this run — a fixture, not
+          live circuit-tracer. Left dots are prompt tokens the model was given.
+          Middle dots are features: internal units that were active. The right
+          dot is the output token it wrote. The model did not generate the
+          graph. Features are not extra tokens.
+        </p>
+      </section>
+    ) : null;
+
+  const personDoes = (
+    <nav className="person-does" aria-label="What a person does">
+      <p className="kicker">What a person does</p>
+      <p className="person-does-who">
+        You are {actor?.name ?? "a person"}. Not the model.
+      </p>
+      <ol>
+        <li>
+          <a href="#choice">
+            {canChoose ? "Choose a response" : "See the completions"}
+          </a>
+          {canChoose
+            ? " — which writer’s completion you prefer. That is not a reading of this unit."
+            : ". A choice needs two writers. This lead has one."}
+        </li>
+        {!claim ? (
+          <li>
+            <a href="#readings">File a reading</a> of this unit — a hypothesis,
+            not a caption from the model.
+          </li>
+        ) : (
+          <li>
+            <a href="#readings">File another reading</a>
+            {contests.length === 0
+              ? ". This article is waiting for a second person."
+              : ". Both stay. The page does not pick a winner."}
+          </li>
+        )}
+        <li>
+          <a href="#thread">Reply in the thread</a>. A comment is not evidence.
+        </li>
+        <li>
+          <a href="#evidence">Attach a number</a> only if you ran the test.
+        </li>
+      </ol>
+    </nav>
+  );
+
   const neighbors = selected
     ? graph?.edges
         .filter(
@@ -146,7 +248,6 @@ export function Article({ featureId }: { featureId: number }) {
         })
         .filter((node): node is GraphNode => Boolean(node)) ?? []
     : [];
-
   const selectedFeature = selected
     ? session?.features.find((f) => f.node_id === selected.id)
     : null;
@@ -156,32 +257,9 @@ export function Article({ featureId }: { featureId: number }) {
       : undefined;
   const jumpId = selected?.feature_id;
   const isOtherArticle = Boolean(jumpId && jumpId !== featureId);
-  const scores =
-    session && feature
-      ? session.scores.filter((item) => item.run_id === feature.run_id)
-      : [];
-
-  async function saveReading(nodeId: string, weight: number) {
-    if (!session || !actor) return;
-    const target = session.features.find((item) => item.node_id === nodeId);
-    if (!target) return;
-    setPendingSave(true);
-    setError(null);
-    try {
-      const next = await createClaim({
-        feature_pk: target.id,
-        author_id: actor.id,
-        kind: "weight",
-        weight,
-        text: `On this run I read Feature ${target.feature_id} as weight ${weight.toFixed(2)}.`,
-      });
-      setSession(next);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save reading");
-    } finally {
-      setPendingSave(false);
-    }
-  }
+  const hasArticle = Boolean(
+    jumpId && CATALOG.some((item) => item.id === jumpId),
+  );
 
   const notes = selected ? (
     <>
@@ -189,7 +267,7 @@ export function Article({ featureId }: { featureId: number }) {
       <p className="reading-who">{kindLabel(selected)}</p>
       <p>{inspectCopy(selected)}</p>
       <p>{neighborSentence(selected, neighbors)}</p>
-      {isOtherArticle && jumpId && (
+      {isOtherArticle && jumpId && hasArticle && (
         <p className="inspect-links">
           <Link
             href={`/wiki/${featureSlug(jumpId)}`}
@@ -204,181 +282,134 @@ export function Article({ featureId }: { featureId: number }) {
     <p>Select a node on the graph.</p>
   );
 
-  const graphCard = graph ? (
-    <section
-      id="attribution"
-      className="float-card is-graph"
-      aria-label="Attribution graph"
-    >
-      <p className="kicker">Graph</p>
-      <GraphSchematic
-        key={feature?.run_id ?? "graph"}
-        nodes={graph.nodes}
-        selectedId={selectedNode}
-        statusByNode={statusByNode}
-        savedRead={savedRead}
-        pendingSave={pendingSave}
-        onSelect={setSelectedNode}
-        onSaveRead={saveReading}
-      />
-      <p className="float-caption">
-        {graph.note} The number on the node is observed. The slider is a local
-        reading.
-      </p>
-    </section>
-  ) : (
-    <section
-      id="attribution"
-      className="float-card is-graph"
-      aria-label="Attribution graph"
-    >
-      <p className="kicker">Graph</p>
-      <p className="quiet">Loading the graph…</p>
-    </section>
-  );
-
-  const runCard = (
-    <section id="observation" className="float-card is-read">
-      <p className="kicker">On this run</p>
-      {run && graph ? (
-        <>
-          <p className="prompt">
-            <span>{graph.prompt_tokens.join("")}</span>
-            <span className="output">{run.output}</span>
-          </p>
-          {writer && <p className="run-model">{writer} · writer</p>}
-          <p>{copy.observation}</p>
-          {scores.length > 0 && (
-            <ul className="score-list">
-              {scores.map((item) => {
-                const name =
-                  session?.models.find((model) => model.id === item.model_id)
-                    ?.name ?? "Scorer";
-                return (
-                  <li key={item.id}>
-                    <span>{name}</span>
-                    <em>
-                      {item.value == null ? "no number" : item.value.toFixed(5)}
-                    </em>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-          {scores.length > 0 && (
-            <p className="section-note">
-              Not a measurement of the feature. Another open model scored the
-              written pair.
+  const graphRail = (
+    <aside className="float-rail" aria-label="Graph and notes">
+      <section id="attribution" className="float-card is-graph">
+        <p className="kicker">Graph · a measurement</p>
+        {graph ? (
+          <>
+            <GraphSchematic
+              key={feature?.run_id ?? "graph"}
+              nodes={graph.nodes}
+              edges={graph.edges}
+              selectedId={selectedNode}
+              statusByNode={statusByNode}
+              savedRead={savedRead}
+              pendingSave={pendingSave}
+              onSelect={setSelectedNode}
+              onSaveRead={saveReading}
+              asName={actor?.name}
+            />
+            <p className="float-caption">
+              The writer did not draw this. A tracer measured which given
+              tokens and internal units wrote into the output. Observed stays on
+              the node. The words are a person’s local weight, not a meaning.
             </p>
-          )}
-        </>
-      ) : (
-        <p className="quiet">Loading the run…</p>
-      )}
-    </section>
-  );
-
-  const notesCard = (
-    <section className="float-card is-notes" aria-live="polite">
-      <p className="kicker">Note</p>
-      {notes}
-    </section>
-  );
-
-  const head = (
-    <header className="folio-head">
-      <p className="folio-issue">
-        {issue} / {copy.title}
-        {writer ? ` · ${writer}` : ""}
-      </p>
-      <h1 className="folio-title">{entry?.lemma ?? copy.title}</h1>
-      {byline && <p className="folio-by">{byline}</p>}
-      <p className="folio-dek">{markedDek(copy.about, copy.pull)}</p>
-    </header>
-  );
-
-  const rail = (
-    <aside className="float-rail" aria-label="On this page, graph, and notes">
-      <FolioToc />
-      {runCard}
-      {session && actor && (
-        <ClaimBody
-          session={session}
-          actor={actor}
-          feature={feature}
-          claim={claim}
-          compose={compose}
-          onCompose={setCompose}
-          onSession={setSession}
-          part="readings"
-        />
-      )}
-      {graphCard}
-      {notesCard}
+          </>
+        ) : (
+          <p className="quiet">Loading the graph…</p>
+        )}
+      </section>
+      <section className="float-card is-notes" aria-live="polite">
+        <p className="kicker">Note</p>
+        {notes}
+      </section>
     </aside>
   );
 
-  if (error && !session) {
+  function shell(body: ReactNode) {
     return (
-      <div className="folio">
-        <FolioMast />
+      <div className={folioClass}>
+        <FolioMast
+          users={session?.users}
+          actorId={actorId}
+          onActor={session ? setActor : undefined}
+        />
         <div className="folio-stage">
           <article className="article folio-essay">
             {head}
-            <p>{error}</p>
+            {body}
           </article>
-          {rail}
+          {graphRail}
         </div>
       </div>
     );
+  }
+
+  if (error && !session) {
+    return shell(<p>{error}</p>);
   }
 
   if (!session || !actor) {
-    return (
-      <div className="folio">
-        <FolioMast />
-        <div className="folio-stage">
-          <article className="article folio-essay">
-            {head}
-            <p className="quiet">Loading the article…</p>
-          </article>
-          {rail}
-        </div>
-      </div>
-    );
+    return shell(<p className="quiet">Loading the article…</p>);
   }
 
-  return (
-    <div className="folio">
-      <FolioMast />
-      <div className="folio-stage">
-        <article className="article folio-essay">
-          {head}
-          {error && <p className="form-error">{error}</p>}
-
-          <ClaimBody
-            session={session}
-            actor={actor}
-            feature={feature}
-            claim={claim}
-            compose={compose}
-            onCompose={setCompose}
-            onSession={setSession}
-            part="evidence"
-          />
-
-          {feature && (
-            <Talk
-              session={session}
-              featurePk={feature.id}
-              actorId={actorId}
-              onActor={setActorId}
-              onSession={setSession}
-            />
-          )}
-        </article>
-        {rail}
-      </div>
-    </div>
+  return shell(
+    <>
+      {error && <p className="form-error">{error}</p>}
+      {runDid}
+      {run && (
+        <CompletionsChoice
+          session={session}
+          actor={actor}
+          prompt={run.prompt}
+          graphRunId={run.id}
+          onSession={setSession}
+        />
+      )}
+      {personDoes}
+      <ClaimBody
+        session={session}
+        actor={actor}
+        feature={feature}
+        claim={claim}
+        composeClaim={composeClaim}
+        composeChallenge={composeChallenge}
+        composeEvidence={composeEvidence}
+        onComposeClaim={setComposeClaim}
+        onComposeChallenge={setComposeChallenge}
+        onComposeEvidence={setComposeEvidence}
+        onSession={setSession}
+        onRetractChallenge={async (challengeId) => {
+          if (!claim) return;
+          try {
+            setSession(await retractChallenge(claim.id, challengeId, actor.id));
+          } catch (err) {
+            setError(err instanceof Error ? err.message : "Could not retract");
+          }
+        }}
+        part="readings"
+      />
+      <ClaimBody
+        session={session}
+        actor={actor}
+        feature={feature}
+        claim={claim}
+        composeClaim={composeClaim}
+        composeChallenge={composeChallenge}
+        composeEvidence={composeEvidence}
+        onComposeClaim={setComposeClaim}
+        onComposeChallenge={setComposeChallenge}
+        onComposeEvidence={setComposeEvidence}
+        onSession={setSession}
+        part="evidence"
+      />
+      {feature && (
+        <Talk
+          session={session}
+          featurePk={feature.id}
+          actorId={actorId}
+          onActor={setActor}
+          onSession={setSession}
+          onRetractComment={async (commentId) => {
+            try {
+              setSession(await retractComment(commentId, actor.id));
+            } catch (err) {
+              setError(err instanceof Error ? err.message : "Could not retract");
+            }
+          }}
+        />
+      )}
+    </>,
   );
 }

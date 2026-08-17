@@ -30,38 +30,29 @@ function Entry({ item }: { item: CatalogFeature }) {
   );
 }
 
-function Spine({
-  item,
-  asHero = false,
-}: {
-  item: CatalogFeature;
-  asHero?: boolean;
-}) {
-  const Title = asHero ? "h1" : "h2";
+function Spine({ item }: { item: CatalogFeature }) {
   return (
     <article className="front-entry">
       <p className="front-id">
         {item.label} · {item.modelName} · {item.status}
       </p>
       <div className="front-spine">
-        <Title className="front-a">{item.left.text}</Title>
+        <h2 className="front-a">{item.left.text}</h2>
         {item.right && <p className="front-b">{item.right.text}</p>}
         <p className="front-hold">{item.hold}</p>
+        <Link href={`/wiki/${featureSlug(item.id)}`} className="front-go">
+          Open the article
+        </Link>
       </div>
-      <Link href={`/wiki/${featureSlug(item.id)}`} className="front-go">
-        Open the article
-      </Link>
     </article>
   );
 }
 
 export default function Home() {
-  const featuredIds = [18472, 5560, 2104, 7781, 3308];
+  const featuredIds = [3102, 4402, 5510, 5520, 6601, 5560, 4408, 6610];
   const featured = featuredIds
     .map((id) => CATALOG.find((item) => item.id === id))
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
-  const hero = featured[0];
-  const more = featured.slice(1);
 
   return (
     <div className="front">
@@ -70,7 +61,7 @@ export default function Home() {
           Signified
         </Link>
         <nav className="front-nav" aria-label="Wiki">
-          <Link href="/wiki">Articles</Link>
+          <Link href="/articles">Articles</Link>
           <Link href="/wiki/method">Method</Link>
           <Link href="/blog/types">Types</Link>
         </nav>
@@ -79,51 +70,76 @@ export default function Home() {
       
 
       <section className="front-hero">
-
-        
         <div className="front-stage">
-
-
-          <h3 className="front-title">
-            Signified  </h3>
-            
-           <h2 className="front-subtitle">
-            A wikipedia for language model preferences and human views <br/>
-          <span className=" front-subtitle-books" > Evaluate  <img src="books/book-1.png" alt="Book 2" />, discuss <img src="books/book-2.png" alt="Book 1" />, and understand AI  subjective views <img src="books/book-3.png" alt="Book 2" />
-          </span>
-
-            
-           </h2>  
-          <Spine item={hero} asHero />
+          <h1 className="front-title">Signified</h1>
+          <p className="front-subtitle">
+            A Wikipedia for language model preferences and human views.
+          </p>
+          <p className="front-why">
+            Language models have preferences, tendencies, representations, and
+            behaviors. Signified is a place to discover them, investigate them,
+            and see how people interpret them.
+          </p>
+          <p className="front-acts">
+            Discover{" "}
+            <span className="front-chip">
+              <img
+                src="/gallery-wall.jpg"
+                alt=""
+                className="is-observe"
+              />
+            </span>{" "}
+            investigate{" "}
+            <span className="front-chip">
+              <img
+                src="/gallery-wall.jpg"
+                alt=""
+                className="is-interpret"
+              />
+            </span>{" "}
+            interpret{" "}
+            <span className="front-chip">
+              <img
+                src="/gallery-wall.jpg"
+                alt=""
+                className="is-debate"
+              />
+            </span>
+          </p>
+          <Link href="/wiki/feature-3102" className="front-go">
+            Open a contested article
+          </Link>
         </div>
         <HalftonePlate
           className="is-wall"
           image="/gallery-wall.jpg"
-          label="The gallery wall, looking down the run."
+          label="The gallery wall."
         />
       </section>
 
-      <footer className="front-foot">
-        <div className="front-prompts">
-          {CATALOG_RUNS.map((run) => (
-            <p className="front-prompt" key={run.id}>
-              <span className="front-prompt-model">
-                {run.modelName} · {run.role}
-              </span>
-              <span>{run.prompt}</span>
-              <span className="output">{run.output}</span>
-            </p>
-          ))}
-        </div>
-        <Link href="/wiki" className="front-go">
-          All articles
-        </Link>
-      </footer>
+      <section className="front-second">
+        <footer className="front-foot">
+          <div className="front-prompts">
+            {CATALOG_RUNS.map((run) => (
+              <p className="front-prompt" key={run.id}>
+                <span className="front-prompt-model">
+                  {run.modelName} · {run.role}
+                </span>
+                <span>{run.prompt}</span>
+                <span className="output">{run.output}</span>
+              </p>
+            ))}
+          </div>
+          <Link href="/articles" className="front-go">
+            All articles
+          </Link>
+        </footer>
 
-      <section className="front-entries" aria-label="More entries">
-        {more.map((item) => (
-          <Spine key={item.id} item={item} />
-        ))}
+        <section className="front-entries" aria-label="Articles">
+          {featured.map((item) => (
+            <Spine key={item.id} item={item} />
+          ))}
+        </section>
       </section>
 
       <section className="front-lower">
@@ -185,60 +201,92 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="front-does" aria-labelledby="does-title">
-        <p className="shelf-label">What this does</p>
-        <h2 id="does-title">The computer measures. People interpret.</h2>
-        <p>
-          Signified is a wiki of contested readings of what happens inside
-          models, and of how those readings meet public ones. It does not
-          complete the sentence “this feature represents…” for you. One model
-          writes. Other open models may score that pair. Those scores are not
-          evidence about a feature.
+      <section className="front-does" aria-labelledby="explore-title">
+        <section className="does-chapter" aria-labelledby="explore-title">
+          <h2 id="explore-title">Explore what models prefer</h2>
+          <p>
+            Models can be measured from the inside. Features can be identified.
+            Behaviors can be tested. Preferences can be compared across models.
+          </p>
+          <p>
+            Signified turns those observations into a shared, searchable body of
+            knowledge. Each entry brings together the model behavior, the
+            evidence behind it, and the views people have formed around it.
+          </p>
+          <ul className="does-list">
+            <li>
+              <strong>Discover</strong>
+              <span>
+                Preferences, tendencies, representations, and behaviors —
+                collected as entries.
+              </span>
+            </li>
+            <li>
+              <strong>Investigate</strong>
+              <span>
+                Measure from the inside. Identify features. Test behaviors.
+              </span>
+            </li>
+            <li>
+              <strong>Compare</strong>
+              <span>
+                Scorers can look at the same written pair. That is not a
+                measurement of the feature.
+              </span>
+            </li>
+            <li>
+              <strong>Evidence</strong>
+              <span>
+                The measurable behavior, and the test behind it, on the same
+                page as the view.
+              </span>
+            </li>
+            <li>
+              <strong>Interpret</strong>
+              <span>The views people have formed around an entry.</span>
+            </li>
+            <li>
+              <strong>Challenge</strong>
+              <span>
+                Discuss and contest. Some views converge. Others stay open.
+                That disagreement is part of the knowledge.
+              </span>
+            </li>
+          </ul>
+        </section>
+
+        <section className="does-chapter" aria-labelledby="evidence-title">
+          <h2 id="evidence-title">Where evidence meets interpretation</h2>
+          <p>
+            A model can consistently prefer one answer over another. What that
+            preference means is another question.
+          </p>
+          <p>
+            Signified makes room for both: the measurable behavior and the human
+            interpretation. People can discuss and challenge the views attached
+            to a model. Some will converge. Others will remain contested. That
+            disagreement is part of the knowledge.
+          </p>
+        </section>
+
+        <section className="does-chapter" aria-labelledby="vocab-title">
+          <h2 id="vocab-title">Building the vocabulary of AI</h2>
+          <p>
+            As models become more capable, we need better ways to describe what
+            they do—and what we think is happening inside them. Signified is
+            building that vocabulary in public.
+          </p>
+          <p>
+            A living map of model preferences, features, behaviors, and
+            interpretations.
+          </p>
+        </section>
+
+        <p className="front-signal">
+          The model produces the signal.
+          <br />
+          Signified captures what it comes to mean.
         </p>
-        <ul className="does-list">
-          <li>
-            <strong>Articles</strong>
-            <span>
-              One page per internal unit on a run. Canberra and the Iliad both
-              have a place. The article does not pick a winner.
-            </span>
-          </li>
-          <li>
-            <strong>Attribution</strong>
-            <span>
-              Hold the graph as a fixture. Select a node. A path is not a
-              meaning, and a local reading is not a measurement.
-            </span>
-          </li>
-          <li>
-            <strong>Readings</strong>
-            <span>
-              Propose what a unit is doing. Another person may file a second
-              reading. Both stay.
-            </span>
-          </li>
-          <li>
-            <strong>Evidence</strong>
-            <span>
-              Attach a numerical result from an experiment that was actually
-              run. A score from another model is not that.
-            </span>
-          </li>
-          <li>
-            <strong>Talk</strong>
-            <span>
-              Comment, dissent, or bring a public view to the same feature. A
-              comment is never proof.
-            </span>
-          </li>
-          <li>
-            <strong>Status</strong>
-            <span>
-              Contested, supported, unresolved, or a stub. Supported is not
-              settled. Uncontested is still a claim.
-            </span>
-          </li>
-        </ul>
         <p className="does-more">
           <Link href="/wiki/method" className="text-link">
             How a reading is held

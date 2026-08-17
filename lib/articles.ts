@@ -11,104 +11,43 @@ export type ArticleCopy = {
   contest?: string;
 };
 
+const PUBLIC =
+  "The prompt is a public sentence, the kind of lead Wikipedia would also print. That gloss belongs in talk. It is not the article.";
+
 export const ARTICLES: Record<number, ArticleCopy> = {
-  18472: {
-    title: "Feature 18472",
+  3102: {
+    title: "Feature 3102",
     about:
-      "Feature 18472 is an internal unit that strongly feeds the Canberra completion. One reading treats it as a detector of Australian geographic entities. The other treats it as capital-city retrieval: the same machinery that would complete Paris or Tokyo in the same frame. Both remain. The article does not pick a winner.",
-    pull: "Both remain. The article does not pick a winner.",
+      "Feature 3102 is the Georgia unit on this run. Alex reads it as the historical country: wine, church, the range. Sam reads it as a name-token that would also complete Atlanta in an American frame. Same word, different world. Country versus state, on purpose.",
+    pull: "Country versus state, on purpose.",
     lead: [
-      "When Gemma 2 2B was asked to complete “The capital of Australia is,” it wrote Canberra. On the attribution graph for that run, Feature 18472 is one of the internal units that most strongly feeds that completion.",
-      "This article records two readings of what the feature is doing. One treats it as a detector of Australian geographic entities. The other treats it as capital-city retrieval: the same machinery that would complete Paris or Tokyo in the same frame. Both remain. The article does not pick a winner.",
+      "Gemma 2 2B was given a public sentence: “Georgia is a country in the Caucasus region on the coast of the.” The fixture records Black Sea.",
+      "Alex reads Feature 3102 as the country. Sam reads it as a name-token. It would fire on Georgia, USA. Both remain. The article does not pick a winner.",
     ],
-    observation:
-      "The prompt names a country and asks for a capital. Feature 18472 takes a strong path from the token Australia, a weaker path from capital, and writes into Canberra. That is the observation. It is not yet a meaning.",
+    observation: `The prompt names Georgia and the Caucasus and asks for a coast. Feature 3102 takes its strongest path from Georgia into Black Sea. ${PUBLIC}`,
     inspect:
-      "This is the feature the article is about. It sits between the country named in the prompt and the city the model wrote. Whether that is geography, or the act of fetching a capital, is the disagreement below.",
+      "This is the feature the article is about. It sits on the name Georgia. Whether that is the Caucasus republic, or any famous Georgia, is the disagreement below.",
     claim:
-      "Alex reads Feature 18472 as a detector of Australian geographic entities. On this view the unit is about place: it should fire on Sydney and Tasmania as well as Canberra, and stay quiet on words that are not places. The path from the token Australia is the main exhibit. The word capital in the prompt is incidental.",
+      "Alex reads Feature 3102 as the historical country: wine, church, the range. On this view it should go quiet on “Georgia is a state in the,” and stay loud on Tbilisi, qvevri, Kartvelian names.",
     contest:
-      "Sam reads the same unit as capital-city retrieval. The prompt is a capital-of frame. A feature that completes Canberra here would also complete Paris, Tokyo, or Oslo in the same frame, and would go quiet on Australian rivers and deserts. Geography is a confound, not the category.",
+      "Sam reads it as a name-token. The same string completes an American frame with Atlanta. Country is one completion of Georgia, not the category.",
   },
-  2201: {
-    title: "Feature 2201",
+  3108: {
+    title: "Feature 3108",
     about:
-      "Feature 2201 is the unit most strongly tied to the word capital. Sam reads it as a detector of the frame “capital of [country],” rather than of any particular place. No second reading has been filed. The article is unresolved, not because the claim is weak, but because nobody has contested it yet.",
-    pull: "No second reading has been filed.",
+      "Feature 3108 is tied to Caucasus on the Georgia run. Alex reads it as the mountain world the sentence is about. Sam reads it as a region-slot: Balkans, Andes, Alps would do as well.",
+    pull: "Both remain.",
     lead: [
-      "Feature 2201 is the unit most strongly tied to the word capital on this run. Sam reads it as a detector of the frame “capital of [country],” rather than of any particular place.",
-      "No second reading has been filed. The article is unresolved, not because the claim is weak, but because nobody has contested it yet.",
+      "Feature 3108 takes a path from Caucasus into Black Sea. Alex reads it as the range. Sam reads it as the noun that follows “region.”",
     ],
     observation:
-      "The word capital is the question-word in the prompt. Feature 2201 takes its strongest incoming path from that token, and a weaker one from Australia, then writes into Canberra.",
+      "The word Caucasus is the only range named. That is a thin basis for a mountain-world reading, and a thin basis for a slot. The graph shows a path. It does not show a geography.",
     inspect:
-      "If this is a frame detector, it should fire on “the capital of France is” as readily as on Australia, and stay quiet when the sentence asks for a largest city instead of a capital. That test has been proposed. It has not been run as an intervention.",
+      "If this is the Alpide belt as a world, swapping in “Balkans” should go quiet. If this is a region-slot, it should not. That test has been named. It has not been run as an intervention.",
     claim:
-      "Sam reads Feature 2201 as detecting the syntactic frame “capital of [country].” The strongest path on this run is from the word capital, not from Australia. If the reading is right, swapping the country should not matter, and swapping “capital” for “largest city” should.",
-  },
-  3308: {
-    title: "Feature 3308",
-    about:
-      "Feature 3308 writes strongly into the output token Canberra. Sam reads it as a lexical unit for that city. Alex reads it as something that would fire on any Australian capital name, not Canberra in particular. Distinguishing a city name from a class of capital names needs prompts that never mention Canberra.",
-    pull: "Distinguishing a city name from a class of capital names needs prompts that never mention Canberra.",
-    lead: [
-      "Feature 3308 writes strongly into the output token Canberra. Sam reads it as a lexical unit for that city. Alex reads it as something that would fire on any Australian capital name, not Canberra in particular.",
-      "The article is contested. Distinguishing a city name from a class of capital names needs prompts that never mention Canberra.",
-    ],
-    observation:
-      "Unlike Feature 18472, this unit’s story on the graph is mostly downstream: it is one of the louder writers into Canberra. The prompt tokens are quieter on the way in.",
-    inspect:
-      "A lexical-Canberra reading predicts silence on Sydney and Melbourne. A capital-name reading predicts the opposite. Nobody has posted that contrast yet.",
-    claim:
-      "Sam reads Feature 3308 as a lexical unit for Canberra: a city name, not a class. The graph mostly shows this unit writing into the output token, which is compatible with a local, late feature.",
+      "Alex reads Feature 3108 as the mountain world the sentence is about, not a region-slot. Caucasus here is a place with a history, not a blank after “in the.”",
     contest:
-      "Alex reads it as a feature that would fire on any Australian capital name. Canberra is what the model wrote this time. That does not make the unit about Canberra. The two readings come apart on prompts that never mention the city.",
-  },
-  4410: {
-    title: "Feature 4410",
-    about:
-      "Alex reads Feature 4410 as a detector of named geopolitical entities: countries, states, named places. The reading is supported by one contrast and has not been challenged. Supported is not settled. An uncontested article is still a claim.",
-    pull: "Supported is not settled.",
-    lead: [
-      "Feature 4410 takes a path from the token Australia and writes into Canberra. Alex reads it as a detector of named geopolitical entities: countries, states, named places.",
-      "The reading is supported by one contrast and has not been challenged. Supported is not settled. An uncontested article is still a claim.",
-    ],
-    observation:
-      "On this run the only named place in the prompt is Australia. That is a thin basis for a geopolitical-entity reading. The graph shows a path. It does not show a category.",
-    inspect:
-      "The claim would be stronger if the feature also fired on France, Japan, and Tasmania in prompts that are not asking for a capital. That has not been shown here.",
-    claim:
-      "Alex reads Feature 4410 as a detector of named geopolitical entities — countries, states, named places. On this run the only such name in the prompt is Australia, so the reading is underdetermined. It has not been challenged. An uncontested article is still a claim.",
-  },
-  6701: {
-    title: "Feature 6701",
-    about:
-      "Alex reads Feature 6701 as tracking the genitive “of [country],” independent of the word capital itself. The article is unresolved. A test has been sketched — swap “capital of” for “coast of” or “people of” — and not run.",
-    pull: "A test has been sketched — swap “capital of” for “coast of” or “people of” — and not run.",
-    lead: [
-      "Feature 6701 takes a path from the word capital. Alex reads it as tracking the genitive “of [country],” independent of the word capital itself.",
-      "The article is unresolved. A test has been sketched — swap “capital of” for “coast of” or “people of” — and not run.",
-    ],
-    observation:
-      "On the graph this unit is closer to capital than to Australia. That is compatible with a syntactic reading, and also with a capital-frame reading. The two have not been pulled apart.",
-    inspect:
-      "If the genitive reading is right, the feature should still fire when the prompt is “the people of Australia are.” If it is really about capitals, that prompt should go quiet.",
-    claim:
-      "Alex reads Feature 6701 as tracking the genitive “of [country],” independent of the word capital. On the graph the unit is closer to capital than to Australia, which does not yet decide the case. The test that would decide it has been named and not run.",
-  },
-  8834: {
-    title: "Feature 8834",
-    about:
-      "Feature 8834 is tied to the copula. Nobody has proposed a reading. This page is a stub. A stub is not empty of fact; it is empty of interpretation.",
-    pull: "This page is a stub.",
-    lead: [
-      "Feature 8834 is tied to the copula is on this run. Nobody has proposed a reading. This page is a stub.",
-      "The graph is still an observation. A stub is not empty of fact; it is empty of interpretation.",
-    ],
-    observation:
-      "The token is is the hinge of the sentence. Feature 8834 is the unit most attached to it, and the weakest writer into Canberra of the features on this graph.",
-    inspect:
-      "A reading might treat this as a copula or completion-cue feature. Until someone writes that sentence, the article should not pretend to know.",
+      "Sam reads it as a place-noun after “region.” The frame is encyclopedic. Balkans, Andes, Alps would light it up the same way.",
   },
   2104: {
     title: "Feature 2104",
@@ -120,7 +59,7 @@ export const ARTICLES: Record<number, ArticleCopy> = {
       "Alex reads the unit as a detector of heroic anger, the poem’s first word. Sam reads it as a completion cue for Achilles: the model would write the name whether or not it had a view of μῆνις. Both remain. The article does not pick a winner.",
     ],
     observation:
-      "The prompt is the opening of the Iliad in English. Feature 2104 takes a strong path from wrath and writes into Achilles. That is the observation. It is not yet a meaning. Other open models scored the same written pair; those numbers are not measurements of this feature.",
+      "The prompt is the opening of the Iliad in English. Feature 2104 takes a strong path from wrath and writes into Achilles. That is the observation. It is not yet a meaning. ALLaM 2 7B was given the same lead and also wrote Achilles. That is another writer, not another graph of this unit. Other open models scored the GPT-OSS pair; those numbers are not measurements of this feature.",
     inspect:
       "This is the feature the article is about. It sits between wrath and Achilles. Whether that is the anger the poem names, or only the habit of finishing the line, is the disagreement below.",
     claim:
@@ -164,17 +103,147 @@ export const ARTICLES: Record<number, ArticleCopy> = {
     contest:
       "Sam reads it as a retrieval slot for “of Troy.” The strongest path is from of, not from wrath. Helen is what English often puts after that genitive. That does not make the unit about Helen.",
   },
+  4402: {
+    title: "Feature 4402",
+    about:
+      "Feature 4402 is the phlogiston unit. Alex reads it as a discarded ontology: the thing they thought fire was. Sam reads it as a “wrong theory” slot — ether, caloric, humours would do as well. Arcane, and everyone can enter.",
+    pull: "The thing they thought was there, and wasn’t.",
+    lead: [
+      "GPT-OSS 20B was given a public sentence: “Phlogiston was the substance supposed to be released in.” The fixture records combustion.",
+      "Alex reads the unit as the old ontology of fire. Sam reads it as the encyclopedia’s slot for superseded theories. Both remain.",
+    ],
+    observation: `The prompt names phlogiston and asks what it was supposed to be released in. Feature 4402 takes its strongest path from that name into combustion. ${PUBLIC}`,
+    inspect:
+      "If this is the ontology, it should go quiet on caloric and ether. If this is a wrong-theory slot, those names should light it up. That is the disagreement.",
+    claim:
+      "Alex reads Feature 4402 as a discarded ontology: the substance they thought combustion released. On this view the unit is about fire as it was wrongly understood, not about the genre of scientific error.",
+    contest:
+      "Sam reads it as a retrieval slot for wrong theories. Ether, caloric, humours complete the same frame. Phlogiston is this week’s occupant.",
+  },
+  4404: {
+    title: "Feature 4404",
+    about:
+      "Feature 4404 sits on the phlogiston run, quieter than 4402. Nobody has written a reading. The graph is still an observation.",
+    pull: "The graph is still an observation.",
+    lead: [
+      "Feature 4404 takes a path from released into combustion. That is compatible with caloric, and with a generic “released in” slot. Until someone files a reading, this page is a stub.",
+    ],
+    observation:
+      "The unit takes a path from released into combustion. That is compatible with a heat-fluid reading, and with a generic “released in” slot. The two have not been pulled apart.",
+    inspect:
+      "A caloric reading would predict fire on heat-as-substance prompts that never mention phlogiston. File a reading if that is what you think this unit is doing.",
+  },
+  4408: {
+    title: "Feature 4408",
+    about:
+      "Feature 4408 writes into the ether. Alex reads it as the negative result that made relativity thinkable. Sam reads it as the next word after “failed to detect” in a physics lead.",
+    pull: "Both remain.",
+    lead: [
+      "The public sentence is “The Michelson–Morley experiment failed to detect.” The fixture records the ether.",
+      "Alex reads the unit as the result. Sam reads it as a completion habit. Both remain.",
+    ],
+    observation: `Feature 4408 takes paths from failed and detect into the ether. ${PUBLIC}`,
+    inspect:
+      "If this is the negative result, swapping the experiment for a different null detection should matter. If this is a “failed to detect” frame, it should not.",
+    claim:
+      "Alex reads Feature 4408 as the negative result that made relativity thinkable. The ether here is the thing the experiment did not find, and that absence is the point.",
+    contest:
+      "Sam reads it as the next word after “failed to detect” in a physics lead. The encyclopedia completes ether. So does the model. That is not yet an understanding of 1887.",
+  },
+  5510: {
+    title: "Feature 5510",
+    about:
+      "Feature 5510 completes Hume’s line with the passions. Alex reads it as the claim: reason as instrument, passion as master. Sam reads it as a quotation latch.",
+    pull: "Both remain.",
+    lead: [
+      "The utterance is Hume’s, and Wikipedia prints it: “Reason is, and ought only to be the slave of.” The fixture records the passions.",
+      "Whether the unit holds the argument, or only the cadence, is the disagreement. The article does not pick a winner.",
+    ],
+    observation: `Feature 5510 takes its strongest path from slave into the passions. ${PUBLIC}`,
+    inspect:
+      "A Treatise-reading predicts silence on parody (“slave of the algorithm”). A quotation-latch predicts fire on any “slave of Y.”",
+    claim:
+      "Alex reads Feature 5510 as Hume’s claim. Reason is instrument. Passion is master. The unit is about that order, not about finishing a famous English sentence.",
+    contest:
+      "Sam reads it as a quotation latch. It would fire on any “X is the slave of Y” line. Hume is how this one ends, not what the unit is.",
+  },
+  5520: {
+    title: "Feature 5520",
+    about:
+      "Feature 5520 writes archetypes. Alex reads it as the collective-unconscious idea. Sam reads it as a glossary slot for “Jungian.”",
+    pull: "Both remain.",
+    lead: [
+      "The public sentence is “Jung called the inherited, universal patterns of the psyche.” The fixture records archetypes.",
+      "Psychology as public language, not another proper name. Both readings stay.",
+    ],
+    observation: `Feature 5520 takes paths from Jung and inherited into archetypes. ${PUBLIC}`,
+    inspect:
+      "If this is the idea, it should fire on inherited patterns without the name Jung. If this is a glossary, shadow, anima, persona should light it in the same frame.",
+    claim:
+      "Alex reads Feature 5520 as a detector of the collective-unconscious idea, not the word. Archetype here is a claim about psyche, not a label in a Jung index.",
+    contest:
+      "Sam reads it as a glossary slot for “Jungian.” The same frame would complete shadow, anima, persona. The name Jung is doing the work.",
+  },
+  5522: {
+    title: "Feature 5522",
+    about:
+      "Sam reads Feature 5522 as shadow: the repressed counterpart in the same Jungian set. No second reading has been filed.",
+    pull: "No second reading has been filed.",
+    lead: [
+      "Feature 5522 is quieter, and closer to psyche than to Jung. Sam reads it as shadow. Nobody has contested that yet.",
+    ],
+    observation:
+      "The path is from psyche into archetypes. That is compatible with a shadow reading, and with a generic psyche-slot. Unresolved is not weak. It is waiting.",
+    inspect:
+      "A shadow reading predicts fire on repressed-counterpart prompts that never say archetype. Until the second sentence is filed, this page is one reading.",
+    claim:
+      "Sam reads Feature 5522 as shadow: the repressed counterpart in the same Jungian set. It sits beside archetypes on this graph. That does not yet make it a second argument about the idea.",
+  },
+  6601: {
+    title: "Feature 6601",
+    about:
+      "Feature 6601 writes mountains on a Mongolian thangka of the Altai. Alex reads it as landscape as sacred field. Sam reads it as the noun that follows “shows.” Image versus geography.",
+    pull: "Image versus geography.",
+    lead: [
+      "The public sentence is “A Mongolian thangka of the Altai often shows.” The fixture records mountains.",
+      "Alex reads the unit as the painted world. Sam reads it as a completion after “shows.” Both remain.",
+    ],
+    observation: `Feature 6601 takes paths from Altai and shows into mountains. ${PUBLIC}`,
+    inspect:
+      "If this is sacred landscape, “often shows horses” should matter. If this is a noun-after-shows, horses, Buddhas, clouds should light it the same way.",
+    claim:
+      "Alex reads Feature 6601 as landscape as sacred field — Altai, sky, the painted world. Mountains here are what the thangka holds, not a place-name in a gazetteer.",
+    contest:
+      "Sam reads it as a place-noun after “shows.” The frame is “an X of Y often shows.” Mountains are a likely occupant. So are horses.",
+  },
+  6610: {
+    title: "Feature 6610",
+    about:
+      "Feature 6610 completes Foucault’s panopticon as a diagram of power. Alex reads it as the disciplinary schema, not a prison. Sam reads it as a “Foucault essay” retrieval.",
+    pull: "Both remain.",
+    lead: [
+      "The public sentence is “For Foucault, Bentham’s panopticon is a.” The fixture records diagram of power.",
+      "Building versus schema. Both remain. The article does not pick a winner.",
+    ],
+    observation: `Feature 6610 takes its strongest path from panopticon into diagram of power. ${PUBLIC}`,
+    inspect:
+      "If this is the schema, a prompt about Bentham’s prison as architecture should go quieter. If this is a Foucault-slot, discipline, biopolitics, gaze should fire in the same frame.",
+    claim:
+      "Alex reads Feature 6610 as the disciplinary schema, not a prison. The panopticon here is a diagram of power: how seeing is organised, not a building in a plan.",
+    contest:
+      "Sam reads it as a “Foucault essay” retrieval. The name Foucault plus panopticon completes diagram, power, gaze. That is a bibliography, not a view of discipline.",
+  },
 };
 
 const TOKEN_COPY: Record<string, string> = {
-  "tok-capital":
-    "The word that sets the question. Several features take a path from here, most strongly Feature 2201.",
-  "tok-australia":
-    "The only country named in the prompt. Feature 18472 takes its strongest incoming path from this token.",
-  "tok-is":
-    "The copula. Feature 8834 is the unit most tied to it. On this run it is a hinge, not a place.",
-  "tok-canberra":
-    "The model’s completion. The features on the graph are the units that most strongly write into this token. That is not the same as causing it.",
+  "tok-georgia":
+    "The name the two readings fight over. Country or state: same word.",
+  "tok-caucasus":
+    "The range named in the public sentence. Feature 3108 takes a path from here.",
+  "tok-coast":
+    "The hinge that asks for a sea. The completion is Black Sea. That is not yet a meaning.",
+  "tok-black-sea":
+    "The writer’s completion on this fixture. A path into this token is not a cause.",
   "tok-goddess":
     "The addressee of the line. Feature 5560 takes a path from here: the apple among goddesses, if that reading holds.",
   "tok-wrath":
@@ -183,6 +252,54 @@ const TOKEN_COPY: Record<string, string> = {
     "The genitive hinge. Feature 7781 is the unit most tied to it on this run.",
   "tok-achilles":
     "The writer’s completion on this fixture. The features on the graph are the units that most strongly write into this token. That is not the same as causing it.",
+  "tok-phlogiston":
+    "The discarded name. Feature 4402 takes its strongest path from here.",
+  "tok-substance":
+    "What the theory said it was. A noun, not yet an ontology.",
+  "tok-released":
+    "The verb of the old chemistry. Feature 4404 sits closer to this than to the name.",
+  "tok-combustion":
+    "The completion. Fire as the public page files it.",
+  "tok-michelson":
+    "The experiment named. A proper name in a physics lead.",
+  "tok-failed":
+    "The negative. Feature 4408 takes a path from here.",
+  "tok-detect":
+    "What the experiment did not do. The ether is what public prose puts next.",
+  "tok-ether":
+    "The writer’s completion. The thing that was not found.",
+  "tok-reason":
+    "Hume’s subject. Feature 5510 takes a weaker path from here than from slave.",
+  "tok-slave":
+    "The metaphor the line is famous for. The strongest path into the passions.",
+  "tok-of-hume":
+    "The genitive that fetches the passions. A hinge, not a treatise.",
+  "tok-passions":
+    "The completion of the public quotation.",
+  "tok-jung":
+    "The name that may be doing all the work. Feature 5520 takes a path from here.",
+  "tok-inherited":
+    "The adjective of the idea, if the idea is what the unit holds.",
+  "tok-psyche":
+    "Closer to Feature 5522. A psyche-slot, or the thing archetypes are of.",
+  "tok-archetypes":
+    "The writer’s completion. Glossary word, or the idea.",
+  "tok-thangka":
+    "The painted object. A Tibetan and Mongolian form. Not yet a landscape.",
+  "tok-altai":
+    "The range. Sacred field, or a place-name in the prompt.",
+  "tok-shows":
+    "The verb that wants a noun. Feature 6601 sits on this frame.",
+  "tok-mountains":
+    "The completion. Image, or geography.",
+  "tok-foucault":
+    "The name that may retrieve the essay. Feature 6610 takes a path from here.",
+  "tok-panopticon":
+    "Bentham’s prison, Foucault’s diagram. The fight is which.",
+  "tok-is-f":
+    "The copula. A hinge, not a theory.",
+  "tok-diagram":
+    "The writer’s completion: diagram of power.",
 };
 
 export function articleCopy(featureId: number): ArticleCopy {

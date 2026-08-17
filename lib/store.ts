@@ -1,7 +1,12 @@
 import { SEED } from "@/lib/seed";
-import type { Claim, ClaimPayload, EvidencePayload, Session } from "@/lib/types";
+import type {
+  Claim,
+  ClaimPayload,
+  EvidencePayload,
+  Session,
+} from "@/lib/types";
 
-const STORAGE_KEY = "signified.session.v2";
+const STORAGE_KEY = "signified.session.v6";
 
 function clone<T>(value: T): T {
   return structuredClone(value);
@@ -40,7 +45,8 @@ function isSession(value: unknown): value is Session {
       Array.isArray(session.users) &&
       Array.isArray(session.features) &&
       Array.isArray(session.claims) &&
-      Array.isArray(session.comments),
+      Array.isArray(session.comments) &&
+      Array.isArray(session.choices),
   );
 }
 
@@ -175,10 +181,51 @@ export async function createEvidence(
   return save(session);
 }
 
+export async function retractChallenge(
+  claimId: number,
+  challengeId: number,
+  author_id: number,
+): Promise<Session> {
+  const session = load();
+  const claim = session.claims.find((item) => item.id === claimId);
+  if (!claim) fail("Claim not found");
+  const challenge = claim.challenges.find((item) => item.id === challengeId);
+  if (!challenge) fail("Reading not found");
+  if (challenge.author_id !== author_id) fail("Only the author can retract");
+  claim.challenges = claim.challenges.filter((item) => item.id !== challengeId);
+  const index = session.claims.findIndex((item) => item.id === claimId);
+  session.claims[index] = refreshClaim(claim);
+  return save(session);
+}
+
+export async function retractComment(
+  id: number,
+  author_id: number,
+): Promise<Session> {
+  const session = load();
+  const comment = session.comments.find((item) => item.id === id);
+  if (!comment) fail("Comment not found");
+  if (comment.author_id !== author_id) fail("Only the author can retract");
+  const drop = new Set<number>([id]);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const item of session.comments) {
+      if (item.parent_id != null && drop.has(item.parent_id) && !drop.has(item.id)) {
+        drop.add(item.id);
+        grew = true;
+      }
+    }
+  }
+  session.comments = session.comments.filter((item) => !drop.has(item.id));
+  return save(session);
+}
+
 export async function createComment(body: {
   feature_pk: number;
   author_id: number;
   text: string;
+  parent_id?: number | null;
 }): Promise<Session> {
   const text = body.text.trim();
   if (text.length < 2 || text.length > 2000) {
@@ -187,12 +234,59 @@ export async function createComment(body: {
   const session = load();
   const feature = session.features.find((item) => item.id === body.feature_pk);
   if (!feature) fail("Feature not found");
+  const parentId = body.parent_id ?? null;
+  if (parentId != null) {
+    const parent = session.comments.find((item) => item.id === parentId);
+    if (!parent || parent.feature_pk !== body.feature_pk) {
+      fail("Parent comment not found");
+    }
+  }
   session.comments.push({
     id: nextId(session.comments),
     feature_pk: body.feature_pk,
     author_id: body.author_id,
+    parent_id: parentId,
     text,
     created_at: stamp(),
   });
+  return save(session);
+}
+
+export async function createChoice(body: {
+  author_id: number;
+  prompt: string;
+  chosen_run_id: number;
+}): Promise<Session> {
+  const session = load();
+  const chosen = session.runs.find((item) => item.id === body.chosen_run_id);
+  if (!chosen) fail("Run not found");
+  if (chosen.prompt !== body.prompt) {
+    fail("Choice must pick a response to this prompt");
+  }
+  const writer = session.models.find((item) => item.id === chosen.model_id);
+  if (writer?.role !== "writer") fail("A choice picks a writer, not a scorer");
+  const among = session.runs.filter((item) => {
+    if (item.prompt !== body.prompt) return false;
+    const model = session.models.find((row) => row.id === item.model_id);
+    return model?.role === "writer";
+  });
+  if (among.length < 2) fail("A choice needs two writers on this lead");
+  const existing = session.choices.find(
+    (item) => item.author_id === body.author_id && item.prompt === body.prompt,
+  );
+  if (existing) {
+    existing.chosen_run_id = body.chosen_run_id;
+    existing.among_run_ids = among.map((item) => item.id);
+    existing.created_at = stamp();
+  } else {
+    session.choices.push({
+      id: nextId(session.choices),
+      author_id: body.author_id,
+      prompt: body.prompt,
+      chosen_run_id: body.chosen_run_id,
+      among_run_ids: among.map((item) => item.id),
+      created_at: stamp(),
+    });
+  }
   return save(session);
 }

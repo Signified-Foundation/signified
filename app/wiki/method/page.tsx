@@ -5,6 +5,7 @@ export default function MethodPage() {
   return (
     <WikiFrame
       current="method"
+      ground="field"
       toc={[
         { href: "#loop", label: "The loop" },
         { href: "#counts", label: "What counts" },
@@ -47,7 +48,7 @@ export default function MethodPage() {
         </p>
 
         <p>
-          <Link href="/wiki/feature-18472" className="text-link">
+          <Link href="/wiki/feature-3102" className="text-link">
             Open a contested article
           </Link>
         </p>

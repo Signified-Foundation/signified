@@ -137,14 +137,14 @@ export const CATALOG: CatalogFeature[] = [
     nodeId: "feat-4404",
     label: "Feature 4404",
     lemma: "caloric",
-    status: "unresolved",
+    status: "none",
     field: "paper",
     left: {
-      text: "A sister of phlogiston: heat as a fluid, also discarded.",
-      by: "Alex",
+      text: "The graph is still an observation.",
+      by: "—",
     },
     right: null,
-    hold: "No second reading yet.",
+    hold: "File the first reading.",
   },
   {
     id: 4408,
@@ -341,4 +341,18 @@ export function articleStateLabel(item: CatalogFeature) {
 
 export function articleField(featureId: number): ArticleField {
   return CATALOG.find((item) => item.id === featureId)?.field ?? "paper";
+}
+
+/** White paper: two readings are held — the wiki article. Green field: one reading, a stub, or a list. */
+export type ArticleGround = "field" | "paper";
+
+export function articleGround(
+  item: CatalogFeature | undefined,
+): ArticleGround {
+  if (!item) return "field";
+  return item.status === "contested" ? "paper" : "field";
+}
+
+export function folioGroundClass(ground: ArticleGround) {
+  return ground === "field" ? "folio is-field" : "folio is-paper";
 }

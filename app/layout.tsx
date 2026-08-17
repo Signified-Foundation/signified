@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Geist, Geist_Mono, Montaga, Newsreader } from "next/font/google";
+import { Geist, Montaga, Newsreader } from "next/font/google";
 import "./globals.css";
 
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-body",
-});
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
 });
 
 const montaga = Montaga({
@@ -28,14 +23,14 @@ const newsreader = Newsreader({
 export const metadata: Metadata = {
   title: "Signified",
   description:
-    "A wiki of contested readings of what happens inside models, and of how those readings meet public ones.",
+    "A Wikipedia for language model preferences and human views. Discover them, investigate them, and see how people interpret them.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${geist.variable} ${geistMono.variable} ${montaga.variable} ${newsreader.variable}`}
+      className={`${geist.variable} ${montaga.variable} ${newsreader.variable}`}
     >
       <body>{children}</body>
     </html>

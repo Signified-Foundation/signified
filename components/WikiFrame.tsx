@@ -13,22 +13,24 @@ export function WikiFrame({
   current,
   toc,
   activeHref,
+  ground = "paper",
   children,
 }: {
   current?: "home" | "method" | "article" | "index";
   toc: TocItem[];
   activeHref?: string;
+  ground?: "field" | "paper";
   children: ReactNode;
 }) {
   return (
-    <div className="wiki">
+    <div className={`wiki is-${ground}`}>
       <header className="mast">
         <Link href="/" className="wordmark">
           Signified
         </Link>
         <nav className="mast-nav" aria-label="Wiki">
           <Link
-            href="/wiki"
+            href="/articles"
             aria-current={current === "index" ? "page" : undefined}
           >
             Articles
