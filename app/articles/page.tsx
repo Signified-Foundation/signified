@@ -27,7 +27,7 @@ export default function ArticlesPage() {
       <div className="issue-stage is-single">
         <article className="issue">
           <header className="folio-head">
-            <p className="folio-issue">Eight runs · two writers</p>
+            <p className="folio-issue">Eight runs · three writers</p>
             <h1 className="folio-title">What happened inside the model</h1>
             <p className="folio-by">Georgia, then the Iliad, then the rest</p>
             <p className="folio-dek">

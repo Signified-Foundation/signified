@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BlogNav } from "@/components/BlogNav";
 
 export const metadata: Metadata = {
   title: "Types · Signified",
   description:
     "The five kinds of thing the wiki holds: observation, claim, evidence, challenge, and talk.",
 };
-
-const NAV = [
-  { href: "/blog/types", label: "Types", current: true },
-  { href: "/articles", label: "Articles" },
-  { href: "/wiki/method", label: "Method" },
-] as const;
 
 const KINDS = [
   {
@@ -81,20 +76,7 @@ export default function TypesPage() {
     <div className="blog-grid is-types-page">
       <h1 className="blog-hej">Types</h1>
 
-      <nav className="blog-nav" aria-label="On this page">
-        <span className="blog-dot" aria-hidden="true" />
-        <ul>
-          {NAV.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                aria-current={"current" in item && item.current ? "page" : undefined}
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+      <BlogNav current="types">
         <p className="blog-nav-label">Kinds</p>
         <ul>
           {KINDS.map((kind) => (
@@ -109,12 +91,19 @@ export default function TypesPage() {
             <a href="#together">Held together</a>
           </li>
         </ul>
-      </nav>
+      </BlogNav>
 
       <div className="blog-copy">
         <p className="blog-dek">
           Five kinds of sentence about the same run. The wiki’s job is to keep
           them from collapsing into each other.
+        </p>
+        <p>
+          These five are the second-order article: what a feature is, argued
+          over. They are not the first-order vote. A Choice — which writer’s
+          completion you prefer — points at a response, never at a unit. Do not
+          smash it in here as a sixth kind. That dictionary is{" "}
+          <Link href="/blog/dictionary">elsewhere</Link>.
         </p>
         <p>
           Signified is not a better graph renderer, and it is not a model that
@@ -169,10 +158,12 @@ export default function TypesPage() {
           </p>
           <p>
             The left column is the essay: what this feature is doing in the
-            argument, not a recap of the graph. The run sits in the header.
-            Alex’s reading, evidence, and talk follow. The graph is first-class
-            on the right, with a note on the selected node. Sam’s contest lives
-            in talk, then a threaded comment.
+            argument, not a recap of the graph. Completions sit first: the
+            writers of this lead, and a Choice if there are two. That vote does
+            not enter the evidence list. The run sits in the header. Alex’s
+            reading, evidence, and talk follow. The graph is first-class on the
+            right, with a note on the selected node. Sam’s contest lives in
+            talk, then a threaded comment.
           </p>
           <p>
             Status on the index — contested, supported, unresolved, stub —

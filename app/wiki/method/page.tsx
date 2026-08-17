@@ -29,12 +29,26 @@ export default function MethodPage() {
           fact. A model-generated explanation is not evidence. A public view that
           meets the model’s is still a reading, not a measurement.
         </p>
+        <p>
+          People also vote on responses. That Choice is first-order: which
+          completion, among the writers of this lead. It does not move a
+          reading.{" "}
+          <Link href="/blog/dictionary" className="text-link">
+            The two votes
+          </Link>
+          {" "}are kept apart on purpose.
+        </p>
 
         <h2 id="counts">What counts</h2>
         <p>
           Evidence is a numerical result from an experiment that was actually
           run. Notes may accompany the number. They do not replace it.
-          Attribution is correlational until an intervention has been run.
+          Attribution is correlational until an intervention has been run. A
+          second writer on the same lead is not that intervention.{" "}
+          <Link href="/blog/interventions" className="text-link">
+            After the completion
+          </Link>
+          .
         </p>
         <p>
           Talk is for people. A comment can disagree with the article, or bring

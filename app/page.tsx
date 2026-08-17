@@ -64,6 +64,7 @@ export default function Home() {
           <Link href="/articles">Articles</Link>
           <Link href="/wiki/method">Method</Link>
           <Link href="/blog/types">Types</Link>
+          <Link href="/blog/dictionary">Dictionary</Link>
         </nav>
       </header>
 
@@ -76,9 +77,9 @@ export default function Home() {
             A Wikipedia for language model preferences and human views.
           </p>
           <p className="front-why">
-            Language models have preferences, tendencies, representations, and
-            behaviors. Signified is a place to discover them, investigate them,
-            and see how people interpret them.
+            Models complete a lead. People then do two jobs: choose a response,
+            and argue what an internal unit is. Preferences are the first vote.
+            Views are the second. They must not collapse.
           </p>
           <p className="front-acts">
             Discover{" "}
@@ -293,6 +294,12 @@ export default function Home() {
           </Link>
           <Link href="/blog/types" className="text-link">
             The five kinds of object
+          </Link>
+          <Link href="/blog/dictionary" className="text-link">
+            The two votes
+          </Link>
+          <Link href="/blog/interventions" className="text-link">
+            After the completion
           </Link>
         </p>
       </section>

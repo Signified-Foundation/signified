@@ -7,7 +7,7 @@ export function FolioMast({
   actorId,
   onActor,
 }: {
-  current?: "articles" | "method" | "types";
+  current?: "articles" | "method" | "types" | "dictionary" | "interventions";
   users?: User[];
   actorId?: number;
   onActor?: (id: number) => void;
@@ -35,6 +35,12 @@ export function FolioMast({
           aria-current={current === "types" ? "page" : undefined}
         >
           Types
+        </Link>
+        <Link
+          href="/blog/dictionary"
+          aria-current={current === "dictionary" ? "page" : undefined}
+        >
+          Dictionary
         </Link>
       </nav>
       {users && onActor && actorId != null && (

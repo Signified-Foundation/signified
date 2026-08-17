@@ -2151,6 +2151,73 @@ button.text-link {
   box-shadow: inset 0 -1px 0 var(--ink);
 }
 
+.choice-block {
+  margin: 0 0 1.8rem;
+  padding-bottom: 1.6rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.choice-lead,
+.choice-note {
+  margin: 0.35rem 0 0;
+  max-width: 42rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-style: italic;
+  color: var(--mute);
+}
+
+.choice-note {
+  margin-top: 0.9rem;
+  font-size: 0.98rem;
+}
+
+.choice-list {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  display: grid;
+  gap: 0.85rem 2rem;
+  max-width: 42rem;
+}
+
+@media (min-width: 720px) {
+  .choice-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.choice-list li {
+  padding: 0.85rem 0 0;
+  border-top: 1px solid var(--rule);
+}
+
+.choice-writer,
+.choice-meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--mute);
+}
+
+.choice-output {
+  margin: 0.2rem 0 0.35rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.2rem;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.choice-list .text-link,
+.choice-list .btn-solid {
+  margin-top: 0.55rem;
+}
+
+.choice-list .btn-solid:disabled {
+  opacity: 1;
+}
+
+.choice-note .text-link {
+  font-style: normal;
+}
+
 .graph-key {
   display: flex;
   flex-wrap: wrap;
