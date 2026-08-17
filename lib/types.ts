@@ -1,6 +1,22 @@
+export type UserKind = "person" | "agent";
+
 export type User = {
   id: number;
   name: string;
+  kind: UserKind;
+  hue: number;
+  hue2: number;
+  image: string | null;
+  note: string;
+};
+
+export type ProfilePayload = {
+  name: string;
+  kind: UserKind;
+  note?: string;
+  image?: string | null;
+  hue?: number;
+  hue2?: number;
 };
 
 export type ModelRole = "writer" | "scorer";

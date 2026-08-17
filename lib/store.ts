@@ -1,12 +1,15 @@
+import { clampHue, randomHues } from "@/lib/profile";
 import { SEED } from "@/lib/seed";
 import type {
   Claim,
   ClaimPayload,
   EvidencePayload,
+  ProfilePayload,
   Session,
+  User,
 } from "@/lib/types";
 
-const STORAGE_KEY = "signified.session.v6";
+const STORAGE_KEY = "signified.session.v7";
 
 function clone<T>(value: T): T {
   return structuredClone(value);
@@ -153,6 +156,11 @@ export async function createEvidence(
   const session = load();
   const claim = session.claims.find((item) => item.id === claimId);
   if (!claim) fail("Claim not found");
+  const author = session.users.find((item) => item.id === body.author_id);
+  if (!author) fail("Enter your name to attach evidence");
+  if (author.kind === "agent") {
+    fail("An agent cannot attach evidence");
+  }
   claim.evidence.push({
     id: nextId(session.claims.flatMap((item) => item.evidence)),
     claim_id: claimId,
@@ -263,6 +271,9 @@ export async function createChoice(body: {
   if (chosen.prompt !== body.prompt) {
     fail("Choice must pick a response to this prompt");
   }
+  if (!session.users.some((item) => item.id === body.author_id)) {
+    fail("Enter your name to vote");
+  }
   const writer = session.models.find((item) => item.id === chosen.model_id);
   if (writer?.role !== "writer") fail("A choice picks a writer, not a scorer");
   const among = session.runs.filter((item) => {
@@ -288,5 +299,72 @@ export async function createChoice(body: {
       created_at: stamp(),
     });
   }
+  return save(session);
+}
+
+export async function createProfile(
+  body: ProfilePayload,
+): Promise<{ session: Session; user: User }> {
+  const trimmed = body.name.trim().replace(/\s+/g, " ");
+  if (trimmed.length < 2 || trimmed.length > 40) {
+    fail("Name must be between 2 and 40 characters");
+  }
+  const kind = body.kind === "agent" ? "agent" : "person";
+  const note = (body.note ?? "").trim().replace(/\s+/g, " ");
+  if (note.length > 80) fail("Note must be 80 characters or fewer");
+  const hues = randomHues();
+  const hue = clampHue(body.hue, hues.hue);
+  const hue2 = clampHue(body.hue2, hues.hue2);
+  const image = body.image?.startsWith("data:image/") ? body.image : null;
+
+  const session = load();
+  const existing = session.users.find(
+    (item) => item.name.toLowerCase() === trimmed.toLowerCase(),
+  );
+  if (existing) {
+    if (kind === "person" && existing.kind === "person") {
+      if (image && !existing.image) {
+        existing.image = image;
+        return { session: save(session), user: existing };
+      }
+      return { session, user: existing };
+    }
+    fail(
+      existing.kind === "agent"
+        ? "That name is already an agent. Open Profiles to enter as it."
+        : "That name is already a person.",
+    );
+  }
+
+  const user: User = {
+    id: nextId(session.users),
+    name: trimmed,
+    kind,
+    hue,
+    hue2,
+    image,
+    note,
+  };
+  session.users.push(user);
+  return { session: save(session), user };
+}
+
+export async function signIn(
+  name: string,
+): Promise<{ session: Session; user: User }> {
+  return createProfile({ name, kind: "person" });
+}
+
+export async function setProfileImage(
+  userId: number,
+  image: string | null,
+): Promise<Session> {
+  const session = load();
+  const user = session.users.find((item) => item.id === userId);
+  if (!user) fail("Profile not found");
+  if (image != null && !image.startsWith("data:image/")) {
+    fail("Choose an image");
+  }
+  user.image = image;
   return save(session);
 }

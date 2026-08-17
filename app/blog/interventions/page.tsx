@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const CLAIMS = [
   {
     id: "intervention",
-    name: "Intervention ≠ extra completion",
+    name: "Intervention is not an extra completion",
     lead: "A completion is an observation. An intervention is a test.",
     body: [
       "The catalog is honest about what it has. A writer was given a public sentence. It wrote the next words. A fixture graph shows which prompt tokens and which internal units wrote into that output. Alex files a reading. Sam files another. Evidence is empty. The tests that would pull the two readings apart have been named. They have not been run.",
@@ -24,7 +24,7 @@ const CLAIMS = [
   },
   {
     id: "other-model",
-    name: "Other model ≠ same feature",
+    name: "Other model is not the same feature",
     lead: "N completions from N APIs are N observations of N writers. They are not N graphs of one feature.",
     body: [
       "Why not give the same lead to N models? You can. That is 1→N at the behaviour layer. Gemma writes Black Sea. Another writer writes something else, or the same thing. The Iliad run now has a small version of this: GPT-OSS 20B wrote Achilles, and so did ALLaM 2 7B. Other open models only scored that pair. They did not write, and they did not produce a graph.",
@@ -37,7 +37,7 @@ const CLAIMS = [
   },
   {
     id: "question",
-    name: "Question ≠ lead",
+    name: "Question is not a lead",
     lead: "The wiki’s prompts are public sentences the model continues. A question is a different task.",
     body: [
       "Georgia is a country in the Caucasus region on the coast of the. That is a public utterance. Wikipedia’s gloss of the same sentence belongs in talk. The model’s job is to continue it. Next-token on a lead is close to the pretraining move the graph is about.",
@@ -53,14 +53,14 @@ const CLAIMS = [
 export default function InterventionsPage() {
   return (
     <div className="blog-grid is-types-page">
-      <h1 className="blog-hej">After</h1>
+      <h1 className="blog-hej">Interventions</h1>
 
       <BlogNav current="interventions">
         <p className="blog-nav-label">Claims</p>
         <ul>
           {CLAIMS.map((claim) => (
             <li key={claim.id}>
-              <a href={`#${claim.id}`}>{claim.name.split(" ≠ ")[0]}</a>
+              <a href={`#${claim.id}`}>{claim.name.split(" is not ")[0]}</a>
             </li>
           ))}
         </ul>

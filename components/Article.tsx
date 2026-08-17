@@ -9,8 +9,9 @@ import { GraphSchematic } from "@/components/GraphSchematic";
 import { Talk } from "@/components/Talk";
 import { articleCopy, inspectCopy, neighborSentence } from "@/lib/articles";
 import { CATALOG, articleGround, folioGroundClass } from "@/lib/catalog";
-import { loadActorId, saveActorId } from "@/lib/actor";
-import { createClaim, getSession, retractChallenge, retractComment } from "@/lib/api";
+import { createClaim, retractChallenge, retractComment } from "@/lib/api";
+import { kindPhrase } from "@/lib/profile";
+import { useActorSession } from "@/lib/useActorSession";
 import { wordFor } from "@/lib/reading";
 import {
   graphOf,
@@ -21,7 +22,7 @@ import {
   writerNameOf,
   writerRunsForPrompt,
 } from "@/lib/session";
-import type { GraphNode, Session, User } from "@/lib/types";
+import type { GraphNode } from "@/lib/types";
 import { featureSlug } from "@/lib/wiki";
 
 function kindLabel(node: GraphNode) {
@@ -51,9 +52,18 @@ export function Article({ featureId }: { featureId: number }) {
   const entry = CATALOG.find((item) => item.id === featureId);
   const ground = articleGround(entry);
   const folioClass = folioGroundClass(ground);
-  const [session, setSession] = useState<Session | null>(null);
+  const {
+    session,
+    setSession,
+    actorId,
+    actor,
+    become,
+    leave,
+    handleCreate,
+    handleSetImage,
+    loadError,
+  } = useActorSession();
   const [error, setError] = useState<string | null>(null);
-  const [actorId, setActorId] = useState(1);
   const [selectedNode, setSelectedNode] = useState<string | null>(
     `feat-${featureId}`,
   );
@@ -62,34 +72,10 @@ export function Article({ featureId }: { featureId: number }) {
   const [composeEvidence, setComposeEvidence] = useState(false);
   const [pendingSave, setPendingSave] = useState(false);
 
-  function setActor(id: number) {
-    setActorId(id);
-    saveActorId(id);
-  }
-
   useEffect(() => {
     setSelectedNode(`feat-${featureId}`);
   }, [featureId]);
-
-  useEffect(() => {
-    let alive = true;
-    getSession()
-      .then((data) => {
-        if (!alive) return;
-        setSession(data);
-        setActorId(loadActorId(data.users.map((user) => user.id)));
-      })
-      .catch(() => {
-        if (alive) {
-          setError("Could not load this run.");
-        }
-      });
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  const actor: User | undefined = session?.users.find((u) => u.id === actorId);
+  const banner = error ?? loadError;
   const feature =
     session?.features.find((f) => f.feature_id === featureId) ?? null;
   const run = feature && session ? runOf(session, feature.run_id) : undefined;
@@ -176,24 +162,29 @@ export function Article({ featureId }: { featureId: number }) {
     run && graph ? (
       <section className="run-did" aria-label="What the model did">
         <p className="kicker">What the model did</p>
-        <p className="run-did-model">
-          {writer ?? "The writer"} completed the prompt. It did not label the
-          graph, and it did not file a reading.
+        <p className="run-did-who">
+          <strong>{writer ?? "The writer"}</strong>
+          completed the prompt. It did not label the graph, and it did not file
+          a reading.
         </p>
-        <p className="run-did-line">
-          <span>Given</span>
-          {graph.prompt_tokens.join("")}
-        </p>
-        <p className="run-did-line is-wrote">
-          <span>Wrote</span>
-          {run.output}
-        </p>
+        <dl className="run-did-pair">
+          <div>
+            <dt>Given</dt>
+            <dd>{graph.prompt_tokens.join("")}</dd>
+          </div>
+          <div className="is-wrote">
+            <dt>Wrote</dt>
+            <dd>{run.output}</dd>
+          </div>
+        </dl>
+        <ul className="run-did-key">
+          <li>Left · prompt tokens</li>
+          <li>Middle · features</li>
+          <li>Right · the output</li>
+        </ul>
         <p className="run-did-note">
-          The graph on the right is a measurement of this run — a fixture, not
-          live circuit-tracer. Left dots are prompt tokens the model was given.
-          Middle dots are features: internal units that were active. The right
-          dot is the output token it wrote. The model did not generate the
-          graph. Features are not extra tokens.
+          The graph is a fixture of this run, not live circuit-tracer. The
+          writer did not draw it. Features are not extra tokens.
         </p>
       </section>
     ) : null;
@@ -202,7 +193,17 @@ export function Article({ featureId }: { featureId: number }) {
     <nav className="person-does" aria-label="What a person does">
       <p className="kicker">What a person does</p>
       <p className="person-does-who">
-        You are {actor?.name ?? "a person"}. Not the model.
+        {actor ? (
+          <>
+            You are {actor.name}, {kindPhrase(actor)}. Not the writer on this
+            run.
+          </>
+        ) : (
+          <>
+            <a href="#login">Enter</a> as a person, or create an agent, to vote
+            or file a reading.
+          </>
+        )}
       </p>
       <ol>
         <li>
@@ -297,7 +298,7 @@ export function Article({ featureId }: { featureId: number }) {
               savedRead={savedRead}
               pendingSave={pendingSave}
               onSelect={setSelectedNode}
-              onSaveRead={saveReading}
+              onSaveRead={actor ? saveReading : undefined}
               asName={actor?.name}
             />
             <p className="float-caption">
@@ -321,9 +322,10 @@ export function Article({ featureId }: { featureId: number }) {
     return (
       <div className={folioClass}>
         <FolioMast
-          users={session?.users}
-          actorId={actorId}
-          onActor={session ? setActor : undefined}
+          actor={actor}
+          onCreate={session ? handleCreate : undefined}
+          onLeave={session ? leave : undefined}
+          onSetImage={session && actor ? handleSetImage : undefined}
         />
         <div className="folio-stage">
           <article className="article folio-essay">
@@ -336,17 +338,17 @@ export function Article({ featureId }: { featureId: number }) {
     );
   }
 
-  if (error && !session) {
-    return shell(<p>{error}</p>);
+  if (banner && !session) {
+    return shell(<p>{banner}</p>);
   }
 
-  if (!session || !actor) {
+  if (!session) {
     return shell(<p className="quiet">Loading the article…</p>);
   }
 
   return shell(
     <>
-      {error && <p className="form-error">{error}</p>}
+      {banner && <p className="form-error">{banner}</p>}
       {runDid}
       {run && (
         <CompletionsChoice
@@ -355,6 +357,7 @@ export function Article({ featureId }: { featureId: number }) {
           prompt={run.prompt}
           graphRunId={run.id}
           onSession={setSession}
+          onActor={become}
         />
       )}
       {personDoes}
@@ -371,7 +374,7 @@ export function Article({ featureId }: { featureId: number }) {
         onComposeEvidence={setComposeEvidence}
         onSession={setSession}
         onRetractChallenge={async (challengeId) => {
-          if (!claim) return;
+          if (!claim || !actor) return;
           try {
             setSession(await retractChallenge(claim.id, challengeId, actor.id));
           } catch (err) {
@@ -399,9 +402,9 @@ export function Article({ featureId }: { featureId: number }) {
           session={session}
           featurePk={feature.id}
           actorId={actorId}
-          onActor={setActor}
           onSession={setSession}
           onRetractComment={async (commentId) => {
+            if (!actor) return;
             try {
               setSession(await retractComment(commentId, actor.id));
             } catch (err) {

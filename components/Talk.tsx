@@ -1,12 +1,10 @@
 "use client";
 
 import { FormEvent, type ReactNode, useState } from "react";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { createComment } from "@/lib/api";
+import { kindPhrase, resolveUser } from "@/lib/profile";
 import type { Comment, Session } from "@/lib/types";
-
-function nameOf(users: Session["users"], id: number) {
-  return users.find((u) => u.id === id)?.name ?? `User ${id}`;
-}
 
 function when(iso: string) {
   const date = new Date(iso.includes("T") ? iso : iso.replace(" ", "T") + "Z");
@@ -32,7 +30,7 @@ function Thread({
   parentId: number | null;
   parentAuthor?: string;
   users: Session["users"];
-  actorId: number;
+  actorId: number | null;
   replyTo: number | null;
   onReply: (id: number | null) => void;
   onRetract?: (id: number) => void;
@@ -44,12 +42,13 @@ function Thread({
   return (
     <ol className={parentId == null ? "thread" : "thread is-nested"}>
       {kids.map((item) => {
-        const who = nameOf(users, item.author_id);
+        const who = resolveUser(users, item.author_id);
         return (
           <li key={item.id} className="thread-item">
             <p className="thread-who">
-              <strong>{who}</strong>
-              <span>a person</span>
+              <ProfileAvatar user={who} size="s" />
+              <strong>{who.name}</strong>
+              <span>{kindPhrase(who)}</span>
               {parentAuthor ? <span>replied to {parentAuthor}</span> : null}
               <span>{when(item.created_at)}</span>
             </p>
@@ -74,7 +73,7 @@ function Thread({
             <Thread
               comments={comments}
               parentId={item.id}
-              parentAuthor={who}
+              parentAuthor={who.name}
               users={users}
               actorId={actorId}
               replyTo={replyTo}
@@ -93,14 +92,12 @@ export function Talk({
   session,
   featurePk,
   actorId,
-  onActor,
   onSession,
   onRetractComment,
 }: {
   session: Session;
   featurePk: number;
-  actorId: number;
-  onActor: (id: number) => void;
+  actorId: number | null;
   onSession: (session: Session) => void;
   onRetractComment?: (id: number) => void;
 }) {
@@ -110,10 +107,11 @@ export function Talk({
   const comments =
     session.comments?.filter((c) => c.feature_pk === featurePk) ?? [];
   const replyParent = comments.find((item) => item.id === replyTo);
-  const actor = nameOf(session.users, actorId);
+  const actor = actorId != null ? resolveUser(session.users, actorId) : null;
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (actorId == null) return;
     const form = event.currentTarget;
     const text = String(new FormData(form).get("text") ?? "");
     setPending(true);
@@ -135,30 +133,33 @@ export function Talk({
     }
   }
 
-  const commentForm = (
+  const commentForm =
+    !actor ? (
+      <p className="quiet">
+        <a href="#login" className="text-link">
+          Enter
+        </a>{" "}
+        to comment.
+      </p>
+    ) : actor ? (
     <form className="comment-form" onSubmit={onSubmit}>
       <div className="comment-bar">
-        <div className="actors" role="group" aria-label="Speak as a person">
-          <span>As</span>
-          {session.users.map((user) => (
-            <button
-              key={user.id}
-              type="button"
-              className={user.id === actorId ? "is-active" : undefined}
-              onClick={() => onActor(user.id)}
-            >
-              {user.name}
-            </button>
-          ))}
-        </div>
+        <p className="actors">
+          <ProfileAvatar user={actor} size="s" />
+          As {actor.name}
+        </p>
         <button className="btn-solid" disabled={pending} type="submit">
           {replyTo ? "Reply" : "Post"}
         </button>
       </div>
       {replyParent && (
         <p className="comment-replying">
-          {actor} replying to {nameOf(session.users, replyParent.author_id)}
+          {actor.name} replying to{" "}
+          {resolveUser(session.users, replyParent.author_id).name}
         </p>
+      )}
+      {actor.kind === "agent" && (
+        <p className="quiet">Commenting as an agent. Not evidence.</p>
       )}
       <textarea
         name="text"
@@ -170,7 +171,7 @@ export function Talk({
       />
       {error && <p className="form-error">{error}</p>}
     </form>
-  );
+    ) : null;
 
   return (
     <section id="talk" className="talk-section">

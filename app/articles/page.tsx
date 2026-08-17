@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { FolioMast } from "@/components/FolioMast";
+import { LiveMast } from "@/components/LiveMast";
 import { WikiAtlas } from "@/components/WikiAtlas";
 import {
   articleState,
@@ -23,7 +23,7 @@ export default function ArticlesPage() {
 
   return (
     <div className="folio is-issue is-field">
-      <FolioMast current="articles" />
+      <LiveMast current="articles" />
       <div className="issue-stage is-single">
         <article className="issue">
           <header className="folio-head">

@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { createChallenge, createClaim, createEvidence } from "@/lib/api";
 import { articleCopy } from "@/lib/articles";
+import { kindPhrase, readingByline, resolveUser } from "@/lib/profile";
 import { meaningClaim } from "@/lib/session";
 import type {
   Claim,
@@ -12,10 +13,11 @@ import type {
   Session,
   User,
 } from "@/lib/types";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 
 type Props = {
   session: Session;
-  actor: User;
+  actor?: User;
   feature: Feature | null;
   claim: Claim | undefined;
   onSession: (session: Session) => void;
@@ -28,10 +30,6 @@ type Props = {
   onRetractChallenge?: (challengeId: number) => void;
   part?: "readings" | "evidence";
 };
-
-function nameOf(users: User[], id: number) {
-  return users.find((u) => u.id === id)?.name ?? `User ${id}`;
-}
 
 function howActive(value: number) {
   if (value >= 0.7) return "active";
@@ -47,6 +45,7 @@ function EvidenceEntry({
   item: Evidence;
   users: User[];
 }) {
+  const author = resolveUser(users, item.author_id);
   const a = item.result.condition_a;
   const b = item.result.condition_b;
   const stance = item.stance === "challenges" ? "Challenges the claim." : "Supports the claim.";
@@ -57,10 +56,14 @@ function EvidenceEntry({
   return (
     <article className="evidence">
       <h4>{item.experiment_name}</h4>
+      <p className="reading-who">
+        <ProfileAvatar user={author} size="s" />
+        {author.name}, {kindPhrase(author)}
+      </p>
       <p>
-        {nameOf(users, item.author_id)} compared {a.name} with {b.name}. The
-        feature was {howActive(a.value)} on the first and {howActive(b.value)} on
-        the second. {stance} {kind}
+        {author.name} compared {a.name} with {b.name}. The feature was{" "}
+        {howActive(a.value)} on the first and {howActive(b.value)} on the
+        second. {stance} {kind}
       </p>
       {item.notes && <p>{item.notes}</p>}
     </article>
@@ -87,7 +90,7 @@ export function ClaimBody({
 
   const suggested: EvidencePayload = useMemo(
     () => ({
-      author_id: actor.id,
+      author_id: actor?.id ?? 0,
       stance: "supports",
       experiment_name: "Contrastive: category vs matched unrelated nouns",
       notes: "Compare activation on the claimed category versus matched unrelated nouns.",
@@ -98,12 +101,12 @@ export function ClaimBody({
       n: 1,
       intervention: false,
     }),
-    [actor.id],
+    [actor?.id],
   );
 
   async function onClaim(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!feature) return;
+    if (!feature || !actor) return;
     const form = new FormData(event.currentTarget);
     setPending(true);
     setError(null);
@@ -124,7 +127,7 @@ export function ClaimBody({
 
   async function onEvidence(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!claim) return;
+    if (!claim || !actor) return;
     const form = new FormData(event.currentTarget);
     setPending(true);
     setError(null);
@@ -152,7 +155,7 @@ export function ClaimBody({
 
   async function onContest(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!claim) return;
+    if (!claim || !actor) return;
     const form = event.currentTarget;
     const alternative_text = String(
       new FormData(form).get("alternative_text") ?? "",
@@ -183,36 +186,42 @@ export function ClaimBody({
 
   if (part === "readings") {
     const contests = meaning?.challenges ?? [];
+    const first = meaning
+      ? resolveUser(session.users, meaning.author_id)
+      : null;
     return (
       <section id="readings" className="claim-read">
-        <p className="kicker">Read · people</p>
-        {meaning ? (
+        <p className="kicker">Read · not facts</p>
+        {meaning && first ? (
           <div className="reading-pair">
             <div className="reading">
               <p className="reading-who">
-                {nameOf(session.users, meaning.author_id)}, a person · a
-                reading, not a fact
+                <ProfileAvatar user={first} size="s" />
+                {first.name}, {readingByline(first, "first")}
               </p>
               <p>{copy.claim ?? meaning.text}</p>
             </div>
-            {contests.map((item) => (
-              <div className="reading" key={item.id}>
-                <p className="reading-who">
-                  {nameOf(session.users, item.author_id)}, a person · another
-                  reading
-                </p>
-                <p>{item.alternative_text}</p>
-                {item.author_id === actor.id && onRetractChallenge && (
-                  <button
-                    type="button"
-                    className="comment-reply"
-                    onClick={() => onRetractChallenge(item.id)}
-                  >
-                    Retract
-                  </button>
-                )}
-              </div>
-            ))}
+            {contests.map((item) => {
+              const who = resolveUser(session.users, item.author_id);
+              return (
+                <div className="reading" key={item.id}>
+                  <p className="reading-who">
+                    <ProfileAvatar user={who} size="s" />
+                    {who.name}, {readingByline(who, "other")}
+                  </p>
+                  <p>{item.alternative_text}</p>
+                  {actor && item.author_id === actor.id && onRetractChallenge && (
+                    <button
+                      type="button"
+                      className="comment-reply"
+                      onClick={() => onRetractChallenge(item.id)}
+                    >
+                      Retract
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ) : (
           <p>
@@ -221,7 +230,11 @@ export function ClaimBody({
           </p>
         )}
         <div className="actions">
-          {!meaning ? (
+          {!actor ? (
+            <a href="#login" className="text-link">
+              Enter to file a reading
+            </a>
+          ) : !meaning ? (
             <button
               type="button"
               className="text-link"
@@ -239,6 +252,11 @@ export function ClaimBody({
             </button>
           )}
         </div>
+        {actor?.kind === "agent" && (
+          <p className="quiet">
+            Filing as an agent. This reading is not evidence.
+          </p>
+        )}
         {error && <p className="form-error">{error}</p>}
         {composeClaim && (
           <form className="compose" onSubmit={onClaim}>
@@ -313,20 +331,34 @@ export function ClaimBody({
               <EvidenceEntry key={item.id} item={item} users={session.users} />
             ))}
             <div className="actions">
-              <button
-                type="button"
-                className="text-link"
-                onClick={() => onComposeEvidence(true)}
-              >
-              Attach evidence as {actor.name}
-              </button>
+              {!actor ? (
+                <a href="#login" className="text-link">
+                  Enter to attach evidence
+                </a>
+              ) : actor.kind === "agent" ? (
+                <p className="quiet">
+                  An agent cannot attach evidence.{" "}
+                  <a href="/profiles" className="text-link">
+                    Enter as a person
+                  </a>
+                  .
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  className="text-link"
+                  onClick={() => onComposeEvidence(true)}
+                >
+                  Attach evidence as {actor.name}
+                </button>
+              )}
             </div>
           </>
         ) : (
           <p className="quiet">Evidence attaches to a reading.</p>
         )}
         {error && <p className="form-error">{error}</p>}
-        {composeEvidence && claim && (
+        {composeEvidence && claim && actor?.kind === "person" && (
           <form className="compose" onSubmit={onEvidence}>
             <p>
               Store a numerical result. Do not attach an explanation from
