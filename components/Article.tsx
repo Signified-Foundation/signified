@@ -8,7 +8,15 @@ import { GraphSchematic } from "@/components/GraphSchematic";
 import { Talk } from "@/components/Talk";
 import { articleCopy, inspectCopy, neighborSentence } from "@/lib/articles";
 import { CATALOG } from "@/lib/catalog";
-import { getSession } from "@/lib/api";
+import { createClaim, getSession } from "@/lib/api";
+import {
+  graphOf,
+  meaningClaim,
+  meaningStatus,
+  runOf,
+  weightClaims,
+  writerNameOf,
+} from "@/lib/session";
 import type { GraphNode, Session, User } from "@/lib/types";
 import { featureSlug } from "@/lib/wiki";
 
@@ -69,6 +77,7 @@ export function Article({ featureId }: { featureId: number }) {
   const [compose, setCompose] = useState<
     "claim" | "challenge" | "evidence" | null
   >(null);
+  const [pendingSave, setPendingSave] = useState(false);
 
   useEffect(() => {
     setSelectedNode(`feat-${featureId}`);
@@ -93,9 +102,12 @@ export function Article({ featureId }: { featureId: number }) {
   const actor: User | undefined = session?.users.find((u) => u.id === actorId);
   const feature =
     session?.features.find((f) => f.feature_id === featureId) ?? null;
-  const claim = session?.claims.find((c) => c.feature_pk === feature?.id);
+  const run = feature && session ? runOf(session, feature.run_id) : undefined;
+  const graph = feature && session ? graphOf(session, feature.run_id) : undefined;
+  const writer = feature && session ? writerNameOf(session, feature.run_id) : undefined;
+  const claim = feature && session ? meaningClaim(session, feature.id) : undefined;
   const selected =
-    session?.graph.nodes.find((n) => n.id === selectedNode) ?? null;
+    graph?.nodes.find((n) => n.id === selectedNode) ?? null;
   const copy = articleCopy(featureId);
   const byline = [entry?.left.by, entry?.right?.by].filter(Boolean).join(" and ");
   const issue = String(CATALOG.findIndex((item) => item.id === featureId) + 1).padStart(
@@ -104,24 +116,33 @@ export function Article({ featureId }: { featureId: number }) {
   );
 
   const statusByNode = useMemo(() => {
-    if (!session) return {};
+    if (!session || !feature) return {};
     const map: Record<string, string | null> = {};
-    for (const item of session.features) {
-      map[item.node_id] =
-        session.claims.find((c) => c.feature_pk === item.id)?.status ?? null;
+    for (const item of session.features.filter((row) => row.run_id === feature.run_id)) {
+      map[item.node_id] = meaningStatus(session, item);
     }
     return map;
-  }, [session]);
+  }, [session, feature]);
+
+  const savedRead = useMemo(() => {
+    if (!session || !feature) return {};
+    const map: Record<string, number> = {};
+    for (const item of session.features.filter((row) => row.run_id === feature.run_id)) {
+      const latest = weightClaims(session, item.id).at(-1);
+      if (latest?.weight != null) map[item.node_id] = latest.weight;
+    }
+    return map;
+  }, [session, feature]);
 
   const neighbors = selected
-    ? session?.graph.edges
+    ? graph?.edges
         .filter(
           (edge) => edge.source === selected.id || edge.target === selected.id,
         )
         .map((edge) => {
           const otherId =
             edge.source === selected.id ? edge.target : edge.source;
-          return session.graph.nodes.find((n) => n.id === otherId);
+          return graph.nodes.find((n) => n.id === otherId);
         })
         .filter((node): node is GraphNode => Boolean(node)) ?? []
     : [];
@@ -129,11 +150,38 @@ export function Article({ featureId }: { featureId: number }) {
   const selectedFeature = selected
     ? session?.features.find((f) => f.node_id === selected.id)
     : null;
-  const selectedClaim = selectedFeature
-    ? session?.claims.find((c) => c.feature_pk === selectedFeature.id)
-    : undefined;
+  const selectedClaim =
+    selectedFeature && session
+      ? meaningClaim(session, selectedFeature.id)
+      : undefined;
   const jumpId = selected?.feature_id;
   const isOtherArticle = Boolean(jumpId && jumpId !== featureId);
+  const scores =
+    session && feature
+      ? session.scores.filter((item) => item.run_id === feature.run_id)
+      : [];
+
+  async function saveReading(nodeId: string, weight: number) {
+    if (!session || !actor) return;
+    const target = session.features.find((item) => item.node_id === nodeId);
+    if (!target) return;
+    setPendingSave(true);
+    setError(null);
+    try {
+      const next = await createClaim({
+        feature_pk: target.id,
+        author_id: actor.id,
+        kind: "weight",
+        weight,
+        text: `On this run I read Feature ${target.feature_id} as weight ${weight.toFixed(2)}.`,
+      });
+      setSession(next);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save reading");
+    } finally {
+      setPendingSave(false);
+    }
+  }
 
   const notes = selected ? (
     <>
@@ -156,7 +204,7 @@ export function Article({ featureId }: { featureId: number }) {
     <p>Select a node on the graph.</p>
   );
 
-  const graphCard = session ? (
+  const graphCard = graph ? (
     <section
       id="attribution"
       className="float-card is-graph"
@@ -164,15 +212,18 @@ export function Article({ featureId }: { featureId: number }) {
     >
       <p className="kicker">Graph</p>
       <GraphSchematic
-        nodes={session.graph.nodes}
+        key={feature?.run_id ?? "graph"}
+        nodes={graph.nodes}
         selectedId={selectedNode}
         statusByNode={statusByNode}
+        savedRead={savedRead}
+        pendingSave={pendingSave}
         onSelect={setSelectedNode}
+        onSaveRead={saveReading}
       />
       <p className="float-caption">
-        Weights, not meanings. Drag a feature’s weight. The constellation
-        reflows. Attribution is correlational until an intervention has been
-        run.
+        {graph.note} The number on the node is observed. The slider is a local
+        reading.
       </p>
     </section>
   ) : (
@@ -189,13 +240,37 @@ export function Article({ featureId }: { featureId: number }) {
   const runCard = (
     <section id="observation" className="float-card is-read">
       <p className="kicker">On this run</p>
-      {session ? (
+      {run && graph ? (
         <>
           <p className="prompt">
-            <span>{session.graph.prompt_tokens.join("")}</span>
-            <span className="output">{session.run.output}</span>
+            <span>{graph.prompt_tokens.join("")}</span>
+            <span className="output">{run.output}</span>
           </p>
+          {writer && <p className="run-model">{writer} · writer</p>}
           <p>{copy.observation}</p>
+          {scores.length > 0 && (
+            <ul className="score-list">
+              {scores.map((item) => {
+                const name =
+                  session?.models.find((model) => model.id === item.model_id)
+                    ?.name ?? "Scorer";
+                return (
+                  <li key={item.id}>
+                    <span>{name}</span>
+                    <em>
+                      {item.value == null ? "no number" : item.value.toFixed(5)}
+                    </em>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {scores.length > 0 && (
+            <p className="section-note">
+              Not a measurement of the feature. Another open model scored the
+              written pair.
+            </p>
+          )}
         </>
       ) : (
         <p className="quiet">Loading the run…</p>
@@ -214,7 +289,7 @@ export function Article({ featureId }: { featureId: number }) {
     <header className="folio-head">
       <p className="folio-issue">
         {issue} / {copy.title}
-        {session ? ` · ${session.run.model_name}` : ""}
+        {writer ? ` · ${writer}` : ""}
       </p>
       <h1 className="folio-title">{entry?.lemma ?? copy.title}</h1>
       {byline && <p className="folio-by">{byline}</p>}
@@ -243,7 +318,7 @@ export function Article({ featureId }: { featureId: number }) {
     </aside>
   );
 
-  if (error) {
+  if (error && !session) {
     return (
       <div className="folio">
         <FolioMast />
@@ -279,6 +354,7 @@ export function Article({ featureId }: { featureId: number }) {
       <div className="folio-stage">
         <article className="article folio-essay">
           {head}
+          {error && <p className="form-error">{error}</p>}
 
           <ClaimBody
             session={session}

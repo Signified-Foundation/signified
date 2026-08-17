@@ -3,6 +3,23 @@ export type User = {
   name: string;
 };
 
+export type ModelRole = "writer" | "scorer";
+
+export type Model = {
+  id: number;
+  name: string;
+  slug: string;
+  role: ModelRole;
+};
+
+export type Run = {
+  id: number;
+  model_id: number;
+  prompt: string;
+  output: string;
+  created_at: string;
+};
+
 export type Feature = {
   id: number;
   run_id: number;
@@ -42,11 +59,15 @@ export type Challenge = {
   created_at: string;
 };
 
+export type ClaimKind = "meaning" | "weight";
+
 export type Claim = {
   id: number;
   feature_pk: number;
   run_id: number;
   author_id: number;
+  kind: ClaimKind;
+  weight: number | null;
   text: string;
   status: "unresolved" | "contested" | "supported";
   created_at: string;
@@ -82,26 +103,33 @@ export type GraphEdge = {
   weight: number;
 };
 
+export type GraphPayload = {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  prompt_tokens: string[];
+  output_tokens: string[];
+  note: string;
+};
+
+export type Score = {
+  id: number;
+  run_id: number;
+  model_id: number;
+  metric: string;
+  value: number | null;
+  notes: string;
+};
+
 export type Session = {
-  run: {
-    id: number;
-    prompt: string;
-    output: string;
-    model_name: string;
-    created_at: string;
-  };
+  models: Model[];
+  runs: Run[];
+  graphs: Record<number, GraphPayload>;
+  scores: Score[];
   observation: { id: number; graph_path: string };
   users: User[];
   features: Feature[];
   claims: Claim[];
   comments: Comment[];
-  graph: {
-    nodes: GraphNode[];
-    edges: GraphEdge[];
-    prompt_tokens: string[];
-    output_tokens: string[];
-    note: string;
-  };
   notice: string;
   constraint: string;
 };
@@ -117,4 +145,12 @@ export type EvidencePayload = {
   condition_b_value: number;
   n: number;
   intervention: boolean;
+};
+
+export type ClaimPayload = {
+  feature_pk: number;
+  author_id: number;
+  text: string;
+  kind?: ClaimKind;
+  weight?: number | null;
 };

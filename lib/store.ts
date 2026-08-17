@@ -1,7 +1,7 @@
 import { SEED } from "@/lib/seed";
-import type { Claim, EvidencePayload, Session } from "@/lib/types";
+import type { Claim, ClaimPayload, EvidencePayload, Session } from "@/lib/types";
 
-const STORAGE_KEY = "signified.session.v1";
+const STORAGE_KEY = "signified.session.v2";
 
 function clone<T>(value: T): T {
   return structuredClone(value);
@@ -33,12 +33,14 @@ function isSession(value: unknown): value is Session {
   if (!value || typeof value !== "object") return false;
   const session = value as Session;
   return Boolean(
-    session.run &&
+    Array.isArray(session.models) &&
+      Array.isArray(session.runs) &&
+      session.graphs &&
+      Array.isArray(session.scores) &&
       Array.isArray(session.users) &&
       Array.isArray(session.features) &&
       Array.isArray(session.claims) &&
-      Array.isArray(session.comments) &&
-      session.graph,
+      Array.isArray(session.comments),
   );
 }
 
@@ -70,26 +72,37 @@ export async function getSession(): Promise<Session> {
   return load();
 }
 
-export async function createClaim(body: {
-  feature_pk: number;
-  author_id: number;
-  text: string;
-}): Promise<Session> {
+export async function createClaim(body: ClaimPayload): Promise<Session> {
+  const kind = body.kind ?? "meaning";
+  const weight =
+    kind === "weight" ? Number(body.weight) : null;
   const text = body.text.trim();
+  if (kind === "weight") {
+    if (weight == null || Number.isNaN(weight) || weight < 0 || weight > 1) {
+      fail("Weight must be a number between 0 and 1");
+    }
+  }
   if (text.length < 8 || text.length > 500) {
     fail("Claim must be between 8 and 500 characters");
   }
   const session = load();
   const feature = session.features.find((item) => item.id === body.feature_pk);
   if (!feature) fail("Feature not found");
-  if (session.claims.some((item) => item.feature_pk === body.feature_pk)) {
-    fail("This feature already has a claim");
+  if (
+    kind === "meaning" &&
+    session.claims.some(
+      (item) => item.feature_pk === body.feature_pk && item.kind !== "weight",
+    )
+  ) {
+    fail("This feature already has a reading");
   }
   session.claims.push({
     id: nextId(session.claims),
     feature_pk: body.feature_pk,
-    run_id: session.run.id,
+    run_id: feature.run_id,
     author_id: body.author_id,
+    kind,
+    weight: kind === "weight" ? weight : null,
     text,
     status: "unresolved",
     created_at: stamp(),

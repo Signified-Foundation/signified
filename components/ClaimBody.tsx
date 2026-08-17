@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { createChallenge, createClaim, createEvidence } from "@/lib/api";
 import { articleCopy } from "@/lib/articles";
+import { meaningClaim, weightClaims } from "@/lib/session";
 import type {
   Claim,
   Evidence,
@@ -163,22 +164,24 @@ export function ClaimBody({
 
   if (!feature) return null;
 
-  const support = claim?.evidence.filter((e) => e.stance === "supports") ?? [];
-  const contest = claim?.evidence.filter((e) => e.stance === "challenges") ?? [];
-  const alternative = claim?.challenges[0];
+  const meaning = meaningClaim(session, feature.id) ?? claim;
+  const weights = weightClaims(session, feature.id);
+  const support = meaning?.evidence.filter((e) => e.stance === "supports") ?? [];
+  const contest = meaning?.evidence.filter((e) => e.stance === "challenges") ?? [];
+  const alternative = meaning?.challenges[0];
   const copy = articleCopy(feature.feature_id);
 
   if (part === "readings") {
     return (
       <section id="readings" className="float-card is-read">
         <p className="kicker">Read</p>
-        {claim ? (
+        {meaning ? (
           <>
             <div className="reading">
               <p className="reading-who">
-                {nameOf(session.users, claim.author_id)} · a reading, not a fact
+                {nameOf(session.users, meaning.author_id)} · a reading, not a fact
               </p>
-              <p>{copy.claim ?? claim.text}</p>
+              <p>{copy.claim ?? meaning.text}</p>
             </div>
             {alternative && (
               <div className="reading">
@@ -200,8 +203,21 @@ export function ClaimBody({
             begins when someone says what they think this unit is doing.
           </p>
         )}
+        {weights.length > 0 && (
+          <div className="reading-weights">
+            {weights.map((item) => (
+              <div className="reading" key={item.id}>
+                <p className="reading-who">
+                  {nameOf(session.users, item.author_id)} · local reading, not a
+                  measurement
+                </p>
+                <p>{item.text}</p>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="actions">
-          {!claim && (
+          {!meaning && (
             <button
               type="button"
               className="text-link"
@@ -210,7 +226,7 @@ export function ClaimBody({
               Propose a reading
             </button>
           )}
-          {claim && (
+          {meaning && (
             <button
               type="button"
               className="text-link"
@@ -247,7 +263,7 @@ export function ClaimBody({
             </div>
           </form>
         )}
-        {compose === "challenge" && claim && (
+        {compose === "challenge" && meaning && (
           <form className="compose" onSubmit={onChallenge}>
             <label>
               Alternative reading

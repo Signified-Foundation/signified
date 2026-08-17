@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { CATALOG } from "@/lib/catalog";
+import { CATALOG_RUNS, catalogForRun } from "@/lib/catalog";
 import { featureSlug } from "@/lib/wiki";
 
 export type TocItem = {
@@ -62,21 +62,30 @@ export function WikiFrame({
               </ul>
             </>
           )}
+          {CATALOG_RUNS.map((run) => (
+            <div key={run.id}>
+              <p className="toc-label">
+                {run.modelName} · {run.kicker}
+              </p>
+              <ul>
+                {catalogForRun(run.id).map((item) => {
+                  const href = `/wiki/${featureSlug(item.id)}`;
+                  return (
+                    <li key={item.id}>
+                      <Link
+                        href={href}
+                        aria-current={activeHref === href ? "page" : undefined}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
           <p className="toc-label">Articles</p>
           <ul>
-            {CATALOG.map((item) => {
-              const href = `/wiki/${featureSlug(item.id)}`;
-              return (
-                <li key={item.id}>
-                  <Link
-                    href={href}
-                    aria-current={activeHref === href ? "page" : undefined}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
             <li>
               <Link
                 href="/wiki/method"

@@ -1,0 +1,59 @@
+{
+  "id": "iliad-001",
+  "note": "Fixture · not circuit-tracer. Select a feature to open its article.",
+  "prompt": "Sing, goddess, the wrath of",
+  "output": "Achilles",
+  "prompt_tokens": ["Sing,", " goddess,", " the", " wrath", " of"],
+  "output_tokens": [" Achilles"],
+  "model": "GPT-OSS 20B",
+  "nodes": [
+    { "id": "tok-goddess", "kind": "token", "label": "goddess", "x": 28, "y": 48 },
+    { "id": "tok-wrath", "kind": "token", "label": "wrath", "x": 28, "y": 160 },
+    { "id": "tok-of", "kind": "token", "label": "of", "x": 28, "y": 272 },
+    {
+      "id": "feat-2104",
+      "kind": "feature",
+      "feature_id": 2104,
+      "layer": 15,
+      "label": "F 2104",
+      "attribution": 0.41,
+      "activation": 3.86,
+      "x": 248,
+      "y": 36
+    },
+    {
+      "id": "feat-5560",
+      "kind": "feature",
+      "feature_id": 5560,
+      "layer": 13,
+      "label": "F 5560",
+      "attribution": 0.24,
+      "activation": 2.21,
+      "x": 248,
+      "y": 140
+    },
+    {
+      "id": "feat-7781",
+      "kind": "feature",
+      "feature_id": 7781,
+      "layer": 12,
+      "label": "F 7781",
+      "attribution": 0.18,
+      "activation": 1.74,
+      "x": 248,
+      "y": 244
+    },
+    { "id": "tok-achilles", "kind": "output", "label": "Achilles", "x": 548, "y": 160 }
+  ],
+  "edges": [
+    { "source": "tok-wrath", "target": "feat-2104", "weight": 0.54 },
+    { "source": "tok-goddess", "target": "feat-2104", "weight": 0.19 },
+    { "source": "tok-goddess", "target": "feat-5560", "weight": 0.38 },
+    { "source": "tok-wrath", "target": "feat-5560", "weight": 0.14 },
+    { "source": "tok-of", "target": "feat-7781", "weight": 0.44 },
+    { "source": "tok-wrath", "target": "feat-7781", "weight": 0.21 },
+    { "source": "feat-2104", "target": "tok-achilles", "weight": 0.58 },
+    { "source": "feat-5560", "target": "tok-achilles", "weight": 0.27 },
+    { "source": "feat-7781", "target": "tok-achilles", "weight": 0.31 }
+  ]
+}

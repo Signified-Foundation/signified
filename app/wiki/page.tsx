@@ -5,9 +5,12 @@ import {
   articleState,
   articleStateLabel,
   CATALOG,
+  CATALOG_RUNS,
+  catalogForRun,
   type CatalogFeature,
   type FeatureStatus,
 } from "@/lib/catalog";
+import { MODELS, SCORES } from "@/lib/models";
 import { featureSlug } from "@/lib/wiki";
 
 const GROUPS: { status: FeatureStatus | "none"; label: string; note: string }[] =
@@ -82,8 +85,6 @@ function Entry({ item, index }: { item: CatalogFeature; index: number }) {
 }
 
 export default function WikiIndexPage() {
-  const featured = CATALOG[0];
-  const featuredCopy = articleCopy(featured.id);
   const counts = {
     contested: CATALOG.filter((i) => i.status === "contested").length,
     supported: CATALOG.filter((i) => i.status === "supported").length,
@@ -97,77 +98,102 @@ export default function WikiIndexPage() {
       <div className="issue-stage">
         <article className="issue">
           <header className="folio-head">
-            <p className="folio-issue">01 / Canberra run · Gemma 2 2B</p>
+            <p className="folio-issue">Two runs · two writers</p>
             <h1 className="folio-title">What happened inside the model</h1>
-            <p className="folio-by">Six features on one completion</p>
+            <p className="folio-by">Canberra, then the Iliad</p>
             <p className="folio-dek">
-              The prompt was “The capital of Australia is.” The model wrote
-              Canberra. These articles record contested readings of the units
-              that most strongly fed that completion. Interpretations stay
-              claims. Evidence stays numbers. The wiki does not pick a winner.
+              Gemma 2 2B wrote Canberra. GPT-OSS 20B wrote Achilles. Other open
+              models scored that second pair; they did not write. These
+              articles record contested readings of the units on each run.
+              Interpretations stay claims. Evidence stays numbers. The wiki
+              does not pick a winner.
             </p>
           </header>
 
-          <p className="issue-prompt">
-            <span>The capital of Australia is</span>
-            <span className="output">Canberra</span>
-          </p>
-
-          <section className="issue-feature" aria-labelledby="featured-title">
-            <p className="kicker">Featured · contested</p>
-            <h2 id="featured-title">
-              <Link href={`/wiki/${featureSlug(featured.id)}`}>
-                {featured.lemma}
-              </Link>
-            </h2>
-            <div className="issue-pair">
-              <blockquote>
-                <cite>{featured.left.by}</cite>
-                <p>{featured.left.text}</p>
-              </blockquote>
-              {featured.right && (
-                <blockquote>
-                  <cite>{featured.right.by}</cite>
-                  <p>{featured.right.text}</p>
-                </blockquote>
-              )}
-            </div>
-            <p className="issue-obs">{featuredCopy.observation}</p>
-            <p className="issue-go">
-              <Link
-                href={`/wiki/${featureSlug(featured.id)}`}
-                className="text-link"
-              >
-                Open the article
-              </Link>
-            </p>
-          </section>
-
-          {GROUPS.map((group) => {
-            const items = CATALOG.filter(
-              (item) =>
-                item.status === group.status && item.id !== featured.id,
-            );
-            if (items.length === 0) return null;
+          {CATALOG_RUNS.map((run) => {
+            const items = catalogForRun(run.id);
+            const featured =
+              items.find((item) =>
+                run.id === 1 ? item.id === 18472 : item.id === 5560,
+              ) ?? items[0];
+            const featuredCopy = articleCopy(featured.id);
             return (
-              <section
-                key={group.status}
-                id={group.status}
-                className="issue-group"
-                aria-labelledby={`${group.status}-title`}
-              >
-                <p className="kicker">{group.label}</p>
-                <h2 id={`${group.status}-title`}>{group.label}</h2>
-                <p className="issue-note">{group.note}</p>
-                <ol className="issue-list">
-                  {items.map((item) => (
-                    <Entry
-                      key={item.id}
-                      item={item}
-                      index={CATALOG.findIndex((row) => row.id === item.id)}
-                    />
-                  ))}
-                </ol>
+              <section key={run.id} className="issue-run" id={`run-${run.id}`}>
+                <p className="issue-prompt">
+                  <span className="front-prompt-model">
+                    {run.modelName} · {run.role} · {run.kicker}
+                  </span>
+                  <span>{run.prompt}</span>
+                  <span className="output">{run.output}</span>
+                </p>
+
+                <section
+                  className="issue-feature"
+                  aria-labelledby={`featured-${run.id}`}
+                >
+                  <p className="kicker">
+                    Featured · {featured.status} · {run.modelName}
+                  </p>
+                  <h2 id={`featured-${run.id}`}>
+                    <Link href={`/wiki/${featureSlug(featured.id)}`}>
+                      {featured.lemma}
+                    </Link>
+                  </h2>
+                  <div className="issue-pair">
+                    <blockquote>
+                      <cite>{featured.left.by}</cite>
+                      <p>{featured.left.text}</p>
+                    </blockquote>
+                    {featured.right && (
+                      <blockquote>
+                        <cite>{featured.right.by}</cite>
+                        <p>{featured.right.text}</p>
+                      </blockquote>
+                    )}
+                  </div>
+                  <p className="issue-obs">{featuredCopy.observation}</p>
+                  <p className="issue-go">
+                    <Link
+                      href={`/wiki/${featureSlug(featured.id)}`}
+                      className="text-link"
+                    >
+                      Open the article
+                    </Link>
+                  </p>
+                </section>
+
+                {GROUPS.map((group) => {
+                  const groupItems = items.filter(
+                    (item) =>
+                      item.status === group.status && item.id !== featured.id,
+                  );
+                  if (groupItems.length === 0) return null;
+                  return (
+                    <section
+                      key={`${run.id}-${group.status}`}
+                      id={`${run.id}-${group.status}`}
+                      className="issue-group"
+                      aria-labelledby={`${run.id}-${group.status}-title`}
+                    >
+                      <p className="kicker">{group.label}</p>
+                      <h2 id={`${run.id}-${group.status}-title`}>
+                        {group.label}
+                      </h2>
+                      <p className="issue-note">{group.note}</p>
+                      <ol className="issue-list">
+                        {groupItems.map((item) => (
+                          <Entry
+                            key={item.id}
+                            item={item}
+                            index={CATALOG.findIndex(
+                              (row) => row.id === item.id,
+                            )}
+                          />
+                        ))}
+                      </ol>
+                    </section>
+                  );
+                })}
               </section>
             );
           })}
@@ -177,35 +203,24 @@ export default function WikiIndexPage() {
           <nav className="folio-toc">
             <p className="toc-label">On this page</p>
             <ul>
-              <li>
-                <a href="#contested">Contested</a>
-              </li>
-              <li>
-                <a href="#supported">Supported</a>
-              </li>
-              <li>
-                <a href="#unresolved">Unresolved</a>
-              </li>
-              <li>
-                <a href="#none">Stubs</a>
-              </li>
+              {CATALOG_RUNS.map((run) => (
+                <li key={run.id}>
+                  <a href={`#run-${run.id}`}>{run.kicker}</a>
+                </li>
+              ))}
             </ul>
           </nav>
           <section className="issue-facts">
-            <p className="toc-label">This run</p>
+            <p className="toc-label">These runs</p>
             <dl>
-              <div>
-                <dt>Prompt</dt>
-                <dd>The capital of Australia is</dd>
-              </div>
-              <div>
-                <dt>Output</dt>
-                <dd>Canberra</dd>
-              </div>
-              <div>
-                <dt>Model</dt>
-                <dd>Gemma 2 2B</dd>
-              </div>
+              {CATALOG_RUNS.map((run) => (
+                <div key={run.id}>
+                  <dt>{run.modelName}</dt>
+                  <dd>
+                    {run.prompt} {run.output}
+                  </dd>
+                </div>
+              ))}
               <div>
                 <dt>Articles</dt>
                 <dd>{CATALOG.length} features</dd>
@@ -218,6 +233,26 @@ export default function WikiIndexPage() {
                 </dd>
               </div>
             </dl>
+            <p className="toc-label">Open scorers</p>
+            <dl>
+              {SCORES.map((score) => {
+                const model = MODELS.find((item) => item.id === score.model_id);
+                return (
+                  <div key={score.id}>
+                    <dt>{model?.name}</dt>
+                    <dd>
+                      {score.value == null
+                        ? "no number emitted"
+                        : score.value.toFixed(5)}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+            <p className="issue-note">
+              Not a measurement of the feature. Another open model scored the
+              written pair.
+            </p>
             <p>
               <Link href="/wiki/method" className="text-link">
                 How a reading is held

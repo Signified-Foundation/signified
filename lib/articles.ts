@@ -110,6 +110,60 @@ export const ARTICLES: Record<number, ArticleCopy> = {
     inspect:
       "A reading might treat this as a copula or completion-cue feature. Until someone writes that sentence, the article should not pretend to know.",
   },
+  2104: {
+    title: "Feature 2104",
+    about:
+      "Feature 2104 is the unit most strongly tied to wrath on the Iliad run. Alex reads it as a detector of heroic anger — μῆνις, the poem’s first word. Sam reads it as a completion cue for “Achilles,” not wrath as such. Both remain. The article does not pick a winner.",
+    pull: "Both remain. The article does not pick a winner.",
+    lead: [
+      "When GPT-OSS 20B was given “Sing, goddess, the wrath of,” the fixture records Achilles. On the attribution graph for that run, Feature 2104 takes its strongest path from wrath into that completion.",
+      "Alex reads the unit as a detector of heroic anger, the poem’s first word. Sam reads it as a completion cue for Achilles: the model would write the name whether or not it had a view of μῆνις. Both remain. The article does not pick a winner.",
+    ],
+    observation:
+      "The prompt is the opening of the Iliad in English. Feature 2104 takes a strong path from wrath and writes into Achilles. That is the observation. It is not yet a meaning. Other open models scored the same written pair; those numbers are not measurements of this feature.",
+    inspect:
+      "This is the feature the article is about. It sits between wrath and Achilles. Whether that is the anger the poem names, or only the habit of finishing the line, is the disagreement below.",
+    claim:
+      "Alex reads Feature 2104 as a detector of heroic anger. μῆνις is the first word of the poem. On this view the unit is about wrath: it should fire when the prompt asks for anger, and stay quiet when the same line is completed by a name-token with the wrath stripped out.",
+    contest:
+      "Sam reads the same unit as a completion cue for Achilles. The English line is famous. A feature that writes Achilles here would also write it after “the wrath of,” even if the model had no view of the poem. Wrath is a cue, not the category.",
+  },
+  5560: {
+    title: "Feature 5560",
+    about:
+      "Feature 5560 is the Paris unit on the Iliad run. Alex reads it as the prince who awards the apple: desire, not a place. Sam reads it as a name-token that would fire on Paris, France in a capital frame. Same word, different argument. Person versus city, on purpose.",
+    pull: "Person versus city, on purpose.",
+    lead: [
+      "Paris is not a token in the prompt. Feature 5560 still sits on this fixture graph, with a path from goddess — the apple among goddesses — into Achilles.",
+      "Alex reads it as the Trojan prince: desire, not a place. Sam reads it as a name-token. It would fire on Paris, France in a capital frame. That is the interesting fight. The article does not pick a winner.",
+    ],
+    observation:
+      "On this run the prompt never names Paris. The graph still draws a path from goddess through this unit into Achilles. That is a thin basis for a person-reading, and a thin basis for a city-reading. The graph shows a path. It does not show which Paris.",
+    inspect:
+      "The two readings come apart on a capital-of frame that never mentions Troy. If this is the prince, that prompt should go quiet. If this is a name-token, Paris, France should light it up. Nobody has posted that contrast as an intervention.",
+    claim:
+      "Alex reads Feature 5560 as the prince who awards the apple. Desire, not a place. The path from goddess is the exhibit: the judgement among goddesses, not a capital city. Paris here is a person.",
+    contest:
+      "Sam reads it as a name-token. The same string completes “the capital of France is.” A feature that fires on Paris the Trojan would, on this view, also fire on Paris the city. Geography is waiting in the next frame. That is why the fight belongs here.",
+  },
+  7781: {
+    title: "Feature 7781",
+    about:
+      "Feature 7781 is the Helen unit on the Iliad run. Alex reads it as the contested cause of the war. Sam reads it as a retrieval slot for “of Troy.” Desire, blame, fame. No second geography lemma.",
+    pull: "Desire, blame, fame. No second geography lemma.",
+    lead: [
+      "Feature 7781 takes a path from of into Achilles. Alex reads it as Helen: the contested cause of the war. Sam reads it as a retrieval slot for “of Troy.”",
+      "The article is contested. The disagreement is not about a city. It is about whether the unit holds a person as cause, or only the genitive that fetches her.",
+    ],
+    observation:
+      "The word of is the hinge after wrath. Feature 7781 is the unit most attached to it on this graph, and a quieter writer into Achilles than wrath. Helen is not named in the prompt.",
+    inspect:
+      "A cause-reading predicts fire on blame and fame, not on place. A retrieval-slot reading predicts fire on “of Troy,” “of Argos,” any genitive that fetches a Homeric name. Distinguishing those needs prompts that never mention Helen.",
+    claim:
+      "Alex reads Feature 7781 as Helen, the contested cause of the war. Desire, blame, fame. On this view the unit is about a person as the argument of the poem, not a slot that fills “of X.”",
+    contest:
+      "Sam reads it as a retrieval slot for “of Troy.” The strongest path is from of, not from wrath. Helen is what English often puts after that genitive. That does not make the unit about Helen.",
+  },
 };
 
 const TOKEN_COPY: Record<string, string> = {
@@ -121,6 +175,14 @@ const TOKEN_COPY: Record<string, string> = {
     "The copula. Feature 8834 is the unit most tied to it. On this run it is a hinge, not a place.",
   "tok-canberra":
     "The model’s completion. The features on the graph are the units that most strongly write into this token. That is not the same as causing it.",
+  "tok-goddess":
+    "The addressee of the line. Feature 5560 takes a path from here: the apple among goddesses, if that reading holds.",
+  "tok-wrath":
+    "The English for μῆνις. Feature 2104 takes its strongest incoming path from this token.",
+  "tok-of":
+    "The genitive hinge. Feature 7781 is the unit most tied to it on this run.",
+  "tok-achilles":
+    "The writer’s completion on this fixture. The features on the graph are the units that most strongly write into this token. That is not the same as causing it.",
 };
 
 export function articleCopy(featureId: number): ArticleCopy {
@@ -128,10 +190,10 @@ export function articleCopy(featureId: number): ArticleCopy {
     ARTICLES[featureId] ?? {
       title: `Feature ${featureId}`,
       about:
-        "This feature appears on the Canberra run. Nobody has written a reading yet.",
+        "This feature appears on the run. Nobody has written a reading yet.",
       pull: "Nobody has written a reading yet.",
       lead: [
-        "This feature appears on the Canberra run. Nobody has written a reading yet. The graph below is the observation.",
+        "This feature appears on the run. Nobody has written a reading yet. The graph below is the observation.",
       ],
       observation:
         "An article begins when someone says what they think this unit is doing. The wiki will not complete that sentence.",

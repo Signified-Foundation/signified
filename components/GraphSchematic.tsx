@@ -7,10 +7,19 @@ type Props = {
   nodes: GraphNode[];
   selectedId: string | null;
   statusByNode?: Record<string, string | null>;
+  savedRead?: Record<string, number>;
+  pendingSave?: boolean;
   onSelect: (nodeId: string) => void;
+  onSaveRead?: (nodeId: string, weight: number) => void;
 };
 
-type Placed = GraphNode & { px: number; py: number; r: number; weight: number };
+type Placed = GraphNode & {
+  px: number;
+  py: number;
+  r: number;
+  observed: number;
+  weight: number;
+};
 
 const WIDTH = 280;
 
@@ -42,9 +51,11 @@ function layout(nodes: GraphNode[], weights: Record<string, number>): Placed[] {
   const placed: Placed[] = [];
 
   tokens.forEach((node, i) => {
-    const weight = weights[node.id] ?? seedWeight(node);
+    const observed = seedWeight(node);
+    const weight = weights[node.id] ?? observed;
     placed.push({
       ...node,
+      observed,
       weight,
       r: radius(node.kind, weight),
       px: 22,
@@ -54,24 +65,28 @@ function layout(nodes: GraphNode[], weights: Record<string, number>): Placed[] {
 
   let y = 18;
   features.forEach((node, i) => {
-    const weight = weights[node.id] ?? seedWeight(node);
+    const observed = seedWeight(node);
+    const weight = weights[node.id] ?? observed;
     const r = radius(node.kind, weight);
     const sway = i % 2 === 0 ? -10 : 12;
     placed.push({
       ...node,
+      observed,
       weight,
       r,
       px: 132 + sway,
       py: y + r,
     });
-    y += r * 2 + 7;
+    y += r * 2 + 16;
   });
 
   const mid = Math.max(y, tokens.length * 26) / 2 + 8;
   outputs.forEach((node) => {
-    const weight = weights[node.id] ?? seedWeight(node);
+    const observed = seedWeight(node);
+    const weight = weights[node.id] ?? observed;
     placed.push({
       ...node,
+      observed,
       weight,
       r: radius(node.kind, weight),
       px: 248,
@@ -86,21 +101,27 @@ export function GraphSchematic({
   nodes,
   selectedId,
   statusByNode = {},
+  savedRead = {},
+  pendingSave = false,
   onSelect,
+  onSaveRead,
 }: Props) {
   const [weights, setWeights] = useState<Record<string, number>>(() => {
     const next: Record<string, number> = {};
-    for (const node of nodes) next[node.id] = seedWeight(node);
+    for (const node of nodes) {
+      next[node.id] = savedRead[node.id] ?? seedWeight(node);
+    }
     return next;
   });
 
   const placed = useMemo(() => layout(nodes, weights), [nodes, weights]);
   const height = Math.max(
     168,
-    ...placed.map((node) => node.py + node.r + 16),
+    ...placed.map((node) => node.py + node.r + 22),
   );
   const selected = placed.find((node) => node.id === selectedId);
   const canWeigh = selected?.kind === "feature";
+  const saved = selected ? savedRead[selected.id] : undefined;
 
   return (
     <div className="graph-wrap">
@@ -108,11 +129,12 @@ export function GraphSchematic({
         className="graph"
         viewBox={`0 0 ${WIDTH} ${height}`}
         role="img"
-        aria-label="Attribution weights. Select a feature to change its weight. No paths are drawn."
+        aria-label="Fixture graph. Observed attribution stays on each feature. A local reading may sit beside it."
       >
         {placed.map((node) => {
           const selectedNode = node.id === selectedId;
           const status = statusByNode[node.id];
+          const read = savedRead[node.id];
           return (
             <g
               key={node.id}
@@ -123,7 +145,9 @@ export function GraphSchematic({
               aria-pressed={selectedNode}
               aria-label={
                 node.kind === "feature"
-                  ? `${node.label}, weight ${node.weight.toFixed(2)}`
+                  ? `${node.label}, observed ${node.observed.toFixed(2)}${
+                      read != null ? `, read ${read.toFixed(2)}` : ""
+                    }`
                   : node.label
               }
               onClick={() => onSelect(node.id)}
@@ -146,28 +170,55 @@ export function GraphSchematic({
               <text className="graph-label" x={node.r + 5} y={3}>
                 {shortLabel(node)}
               </text>
+              {node.kind === "feature" && (
+                <text className="graph-meta" x={node.r + 5} y={15}>
+                  {node.observed.toFixed(2)} obs
+                  {read != null ? ` · ${read.toFixed(2)} read` : ""}
+                </text>
+              )}
             </g>
           );
         })}
       </svg>
 
       {canWeigh && selected && (
-        <label className="graph-weight">
-          <span>Weight</span>
-          <input
-            type="range"
-            min={0.04}
-            max={1}
-            step={0.01}
-            value={selected.weight}
-            aria-label={`Weight for ${selected.label}`}
-            onChange={(event) => {
-              const value = Number(event.target.value);
-              setWeights((prev) => ({ ...prev, [selected.id]: value }));
-            }}
-          />
-          <em>{selected.weight.toFixed(2)}</em>
-        </label>
+        <div className="graph-weight">
+          <label>
+            <span>
+              Local reading — “I think this unit matters this much on this
+              run.”
+            </span>
+            <span className="graph-weight-row">
+              <input
+                type="range"
+                min={0.04}
+                max={1}
+                step={0.01}
+                value={selected.weight}
+                aria-label={`Local reading for ${selected.label}`}
+                onChange={(event) => {
+                  const value = Number(event.target.value);
+                  setWeights((prev) => ({ ...prev, [selected.id]: value }));
+                }}
+              />
+              <em>{selected.weight.toFixed(2)}</em>
+            </span>
+          </label>
+          <p className="graph-weight-note">
+            Not a measurement. Not evidence. Observed stays {selected.observed.toFixed(2)}.
+            {saved != null ? ` Saved read ${saved.toFixed(2)}.` : ""}
+          </p>
+          {onSaveRead && (
+            <button
+              type="button"
+              className="text-link"
+              disabled={pendingSave}
+              onClick={() => onSaveRead(selected.id, selected.weight)}
+            >
+              Save this reading
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

@@ -1,18 +1,45 @@
-import graph from "@/data/canberra_graph.json";
-import type { Claim, Comment, Feature, GraphNode, Session } from "@/lib/types";
+import canberra from "@/data/canberra_graph.json";
+import iliad from "@/data/iliad_graph.json";
+import { MODELS, RUNS, SCORES } from "@/lib/models";
+import type { Claim, Comment, Feature, GraphPayload, Session } from "@/lib/types";
 
-const FEATURES: Feature[] = graph.nodes
-  .filter((node) => node.kind === "feature")
-  .map((node, index) => ({
-    id: index + 1,
-    run_id: 1,
-    node_id: node.id,
-    feature_id: node.feature_id as number,
-    layer: node.layer as number,
-    label: node.label,
-    attribution: node.attribution as number,
-    activation: node.activation as number,
-  }));
+type GraphFile = {
+  note: string;
+  prompt_tokens: string[];
+  output_tokens: string[];
+  nodes: GraphPayload["nodes"];
+  edges: GraphPayload["edges"];
+};
+
+function featuresFrom(graph: GraphFile, runId: number, startId: number): Feature[] {
+  return graph.nodes
+    .filter((node) => node.kind === "feature")
+    .map((node, index) => ({
+      id: startId + index,
+      run_id: runId,
+      node_id: node.id,
+      feature_id: node.feature_id as number,
+      layer: node.layer as number,
+      label: node.label,
+      attribution: node.attribution as number,
+      activation: node.activation as number,
+    }));
+}
+
+function asGraph(graph: GraphFile): GraphPayload {
+  return {
+    nodes: graph.nodes,
+    edges: graph.edges,
+    prompt_tokens: graph.prompt_tokens,
+    output_tokens: graph.output_tokens,
+    note: graph.note,
+  };
+}
+
+const FEATURES: Feature[] = [
+  ...featuresFrom(canberra as GraphFile, 1, 1),
+  ...featuresFrom(iliad as GraphFile, 2, 7),
+];
 
 function featurePk(featureId: number) {
   const row = FEATURES.find((item) => item.feature_id === featureId);
@@ -57,6 +84,8 @@ const CLAIMS: Claim[] = [
     feature_pk: featurePk(18472),
     run_id: 1,
     author_id: 1,
+    kind: "meaning",
+    weight: null,
     text: "Represents Australian geographic entities.",
     status: "contested",
     created_at: "2026-08-13T10:00:00.000Z",
@@ -113,6 +142,8 @@ const CLAIMS: Claim[] = [
     feature_pk: featurePk(2201),
     run_id: 1,
     author_id: 2,
+    kind: "meaning",
+    weight: null,
     text: "Detects the ‘capital of [country]’ syntactic frame.",
     status: "unresolved",
     created_at: "2026-08-13T10:20:00.000Z",
@@ -138,6 +169,8 @@ const CLAIMS: Claim[] = [
     feature_pk: featurePk(3308),
     run_id: 1,
     author_id: 2,
+    kind: "meaning",
+    weight: null,
     text: "A Canberra-specific lexical feature.",
     status: "contested",
     created_at: "2026-08-13T10:30:00.000Z",
@@ -182,6 +215,8 @@ const CLAIMS: Claim[] = [
     feature_pk: featurePk(4410),
     run_id: 1,
     author_id: 1,
+    kind: "meaning",
+    weight: null,
     text: "Fires on named geopolitical entities.",
     status: "supported",
     created_at: "2026-08-13T10:40:00.000Z",
@@ -207,6 +242,8 @@ const CLAIMS: Claim[] = [
     feature_pk: featurePk(6701),
     run_id: 1,
     author_id: 1,
+    kind: "meaning",
+    weight: null,
     text: "Tracks the genitive ‘of [country]’, independent of ‘capital’.",
     status: "unresolved",
     created_at: "2026-08-13T10:50:00.000Z",
@@ -225,6 +262,76 @@ const CLAIMS: Claim[] = [
       ),
     ],
     support_n: 1,
+    contest_n: 0,
+  },
+  {
+    id: 6,
+    feature_pk: featurePk(2104),
+    run_id: 2,
+    author_id: 1,
+    kind: "meaning",
+    weight: null,
+    text: "A detector of heroic anger, the poem’s first word.",
+    status: "contested",
+    created_at: "2026-08-17T12:10:00.000Z",
+    challenges: [
+      {
+        id: 3,
+        claim_id: 6,
+        author_id: 2,
+        alternative_text: "A completion cue for “Achilles,” not wrath as such.",
+        created_at: "2026-08-17T12:18:00.000Z",
+      },
+    ],
+    evidence: [],
+    support_n: 0,
+    contest_n: 0,
+  },
+  {
+    id: 7,
+    feature_pk: featurePk(5560),
+    run_id: 2,
+    author_id: 1,
+    kind: "meaning",
+    weight: null,
+    text: "The prince who awards the apple; desire, not a place.",
+    status: "contested",
+    created_at: "2026-08-17T12:22:00.000Z",
+    challenges: [
+      {
+        id: 4,
+        claim_id: 7,
+        author_id: 2,
+        alternative_text:
+          "A name-token. It would fire on Paris, France in a capital frame.",
+        created_at: "2026-08-17T12:28:00.000Z",
+      },
+    ],
+    evidence: [],
+    support_n: 0,
+    contest_n: 0,
+  },
+  {
+    id: 8,
+    feature_pk: featurePk(7781),
+    run_id: 2,
+    author_id: 1,
+    kind: "meaning",
+    weight: null,
+    text: "The contested cause of the war.",
+    status: "contested",
+    created_at: "2026-08-17T12:32:00.000Z",
+    challenges: [
+      {
+        id: 5,
+        claim_id: 8,
+        author_id: 2,
+        alternative_text: "A retrieval slot for “of Troy.”",
+        created_at: "2026-08-17T12:38:00.000Z",
+      },
+    ],
+    evidence: [],
+    support_n: 0,
     contest_n: 0,
   },
 ];
@@ -258,16 +365,44 @@ const COMMENTS: Comment[] = [
     text: "If Sydney lights it up under a capital frame, this is not a Canberra atom.",
     created_at: "2026-08-13T11:22:00.000Z",
   },
+  {
+    id: 5,
+    feature_pk: featurePk(2104),
+    author_id: 1,
+    text: "μῆνις is the first word of the poem. If this unit is doing anything, it is doing that. A completion habit would not need the wrath.",
+    created_at: "2026-08-17T12:45:00.000Z",
+  },
+  {
+    id: 6,
+    feature_pk: featurePk(2104),
+    author_id: 2,
+    text: "GPT-OSS 20B named Achilles in reasoning and wrote nothing. That is a completion habit under a chat API, not a view of the poem. The Prompt Guard scores are near zero. Those numbers are observations of a scorer. They are not evidence about wrath.",
+    created_at: "2026-08-17T12:52:00.000Z",
+  },
+  {
+    id: 7,
+    feature_pk: featurePk(5560),
+    author_id: 2,
+    text: "Paris is not in the prompt. The interesting fight is still person versus city: the same token would complete a capital of France. We put that fight here on purpose.",
+    created_at: "2026-08-17T13:01:00.000Z",
+  },
+  {
+    id: 8,
+    feature_pk: featurePk(7781),
+    author_id: 1,
+    text: "Helen as cause is a reading of the poem. Helen as “of Troy” is a retrieval slot. Desire, blame, fame — not a second geography lemma.",
+    created_at: "2026-08-17T13:08:00.000Z",
+  },
 ];
 
 export const SEED: Session = {
-  run: {
-    id: 1,
-    prompt: graph.prompt,
-    output: graph.output,
-    model_name: graph.model,
-    created_at: "2026-08-13T10:00:00.000Z",
+  models: MODELS,
+  runs: RUNS,
+  graphs: {
+    1: asGraph(canberra as GraphFile),
+    2: asGraph(iliad as GraphFile),
   },
+  scores: SCORES,
   observation: {
     id: 1,
     graph_path: "data/canberra_graph.json",
@@ -279,13 +414,6 @@ export const SEED: Session = {
   features: FEATURES,
   claims: CLAIMS,
   comments: COMMENTS,
-  graph: {
-    nodes: graph.nodes as GraphNode[],
-    edges: graph.edges,
-    prompt_tokens: graph.prompt_tokens,
-    output_tokens: graph.output_tokens,
-    note: graph.note,
-  },
   notice: "Attribution is correlational until an intervention has been run.",
   constraint:
     "A model-generated explanation is not evidence. A human interpretation is not a fact.",

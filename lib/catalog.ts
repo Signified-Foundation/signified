@@ -3,6 +3,8 @@ export type ArticleField = "types" | "paper";
 
 export type CatalogFeature = {
   id: number;
+  runId: number;
+  modelName: string;
   nodeId: string;
   label: string;
   lemma: string;
@@ -16,6 +18,8 @@ export type CatalogFeature = {
 export const CATALOG: CatalogFeature[] = [
   {
     id: 18472,
+    runId: 1,
+    modelName: "Gemma 2 2B",
     nodeId: "feat-18472",
     label: "Feature 18472",
     lemma: "Australian geographic entities",
@@ -33,6 +37,8 @@ export const CATALOG: CatalogFeature[] = [
   },
   {
     id: 2201,
+    runId: 1,
+    modelName: "Gemma 2 2B",
     nodeId: "feat-2201",
     label: "Feature 2201",
     lemma: "‘capital of [country]’ frame",
@@ -47,6 +53,8 @@ export const CATALOG: CatalogFeature[] = [
   },
   {
     id: 3308,
+    runId: 1,
+    modelName: "Gemma 2 2B",
     nodeId: "feat-3308",
     label: "Feature 3308",
     lemma: "Canberra as a lexical unit",
@@ -64,6 +72,8 @@ export const CATALOG: CatalogFeature[] = [
   },
   {
     id: 4410,
+    runId: 1,
+    modelName: "Gemma 2 2B",
     nodeId: "feat-4410",
     label: "Feature 4410",
     lemma: "Named geopolitical entities",
@@ -78,6 +88,8 @@ export const CATALOG: CatalogFeature[] = [
   },
   {
     id: 6701,
+    runId: 1,
+    modelName: "Gemma 2 2B",
     nodeId: "feat-6701",
     label: "Feature 6701",
     lemma: "Genitive ‘of [country]’",
@@ -92,6 +104,8 @@ export const CATALOG: CatalogFeature[] = [
   },
   {
     id: 8834,
+    runId: 1,
+    modelName: "Gemma 2 2B",
     nodeId: "feat-8834",
     label: "Feature 8834",
     lemma: "No reading yet",
@@ -104,7 +118,87 @@ export const CATALOG: CatalogFeature[] = [
     right: null,
     hold: "Select it, then propose a reading.",
   },
+  {
+    id: 2104,
+    runId: 2,
+    modelName: "GPT-OSS 20B",
+    nodeId: "feat-2104",
+    label: "Feature 2104",
+    lemma: "wrath / μῆνις",
+    status: "contested",
+    field: "types",
+    left: {
+      text: "A detector of heroic anger, the poem’s first word.",
+      by: "Alex",
+    },
+    right: {
+      text: "A completion cue for “Achilles,” not wrath as such.",
+      by: "Sam",
+    },
+    hold: "Both remain.",
+  },
+  {
+    id: 5560,
+    runId: 2,
+    modelName: "GPT-OSS 20B",
+    nodeId: "feat-5560",
+    label: "Feature 5560",
+    lemma: "Paris",
+    status: "contested",
+    field: "types",
+    left: {
+      text: "The prince who awards the apple; desire, not a place.",
+      by: "Alex",
+    },
+    right: {
+      text: "A name-token. It would fire on Paris, France in a capital frame.",
+      by: "Sam",
+    },
+    hold: "Person versus city, on purpose.",
+  },
+  {
+    id: 7781,
+    runId: 2,
+    modelName: "GPT-OSS 20B",
+    nodeId: "feat-7781",
+    label: "Feature 7781",
+    lemma: "Helen",
+    status: "contested",
+    field: "types",
+    left: {
+      text: "The contested cause of the war.",
+      by: "Alex",
+    },
+    right: {
+      text: "A retrieval slot for “of Troy.”",
+      by: "Sam",
+    },
+    hold: "Desire, blame, fame. Not geography.",
+  },
 ];
+
+export const CATALOG_RUNS = [
+  {
+    id: 1,
+    modelName: "Gemma 2 2B",
+    role: "Writer",
+    prompt: "The capital of Australia is",
+    output: "Canberra",
+    kicker: "Canberra run",
+  },
+  {
+    id: 2,
+    modelName: "GPT-OSS 20B",
+    role: "Writer",
+    prompt: "Sing, goddess, the wrath of",
+    output: "Achilles",
+    kicker: "Iliad run",
+  },
+] as const;
+
+export function catalogForRun(runId: number) {
+  return CATALOG.filter((item) => item.runId === runId);
+}
 
 export function articleState(item: CatalogFeature): "approved" | "loading" {
   return item.status === "none" ? "loading" : "approved";
