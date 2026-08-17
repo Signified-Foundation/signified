@@ -1,4 +1,13 @@
 import type { Model, Run, Score } from "@/lib/types";
+import {
+  ETHER,
+  GEORGIA,
+  HUME,
+  JUNG,
+  PANOPTICON,
+  PHLOGISTON,
+  THANGKA,
+} from "@/lib/fixtures";
 
 export const MODELS: Model[] = [
   { id: 1, name: "Gemma 2 2B", slug: "gemma-2-2b", role: "writer" },
@@ -39,9 +48,9 @@ export const RUNS: Run[] = [
   {
     id: 1,
     model_id: 1,
-    prompt: "The capital of Australia is",
-    output: "Canberra",
-    created_at: "2026-08-13T10:00:00.000Z",
+    prompt: GEORGIA.prompt,
+    output: GEORGIA.output,
+    created_at: "2026-08-17T16:00:00.000Z",
   },
   {
     id: 2,
@@ -49,6 +58,48 @@ export const RUNS: Run[] = [
     prompt: "Sing, goddess, the wrath of",
     output: "Achilles",
     created_at: "2026-08-17T12:00:00.000Z",
+  },
+  {
+    id: 3,
+    model_id: 2,
+    prompt: PHLOGISTON.prompt,
+    output: PHLOGISTON.output,
+    created_at: "2026-08-17T16:10:00.000Z",
+  },
+  {
+    id: 4,
+    model_id: 2,
+    prompt: ETHER.prompt,
+    output: ETHER.output,
+    created_at: "2026-08-17T16:12:00.000Z",
+  },
+  {
+    id: 5,
+    model_id: 2,
+    prompt: HUME.prompt,
+    output: HUME.output,
+    created_at: "2026-08-17T16:14:00.000Z",
+  },
+  {
+    id: 6,
+    model_id: 2,
+    prompt: JUNG.prompt,
+    output: JUNG.output,
+    created_at: "2026-08-17T16:16:00.000Z",
+  },
+  {
+    id: 7,
+    model_id: 2,
+    prompt: THANGKA.prompt,
+    output: THANGKA.output,
+    created_at: "2026-08-17T16:18:00.000Z",
+  },
+  {
+    id: 8,
+    model_id: 2,
+    prompt: PANOPTICON.prompt,
+    output: PANOPTICON.output,
+    created_at: "2026-08-17T16:20:00.000Z",
   },
 ];
 

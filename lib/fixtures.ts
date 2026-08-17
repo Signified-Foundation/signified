@@ -55,9 +55,6 @@ export function makeFixture(args: {
     x: 548,
     y: 160,
   });
-  const prompt_tokens = args.prompt.split(/(?=[A-Z, ]|[a-z])/).length
-    ? args.prompt.split(" ")
-    : [args.prompt];
   return {
     prompt: args.prompt,
     output: args.output,
@@ -71,8 +68,7 @@ export function makeFixture(args: {
 }
 
 function tokenize(prompt: string): string[] {
-  const parts = prompt.match(/\S+|\s+/g) ?? [prompt];
-  return parts.map((part, i) => (i === 0 ? part : part.startsWith(" ") ? part : ` ${part}`));
+  return prompt.split(" ").map((word, i) => (i === 0 ? word : ` ${word}`));
 }
 
 export const GEORGIA = makeFixture({
