@@ -1,0 +1,96 @@
+{
+  "id": "canberra-001",
+  "note": "Fixture · not circuit-tracer. Select a feature to open its article.",
+  "prompt": "The capital of Australia is",
+  "output": "Canberra",
+  "prompt_tokens": ["The", " capital", " of", " Australia", " is"],
+  "output_tokens": [" Canberra"],
+  "model": "Gemma 2 2B",
+  "nodes": [
+    { "id": "tok-capital", "kind": "token", "label": "capital", "x": 28, "y": 48 },
+    { "id": "tok-australia", "kind": "token", "label": "Australia", "x": 28, "y": 200 },
+    { "id": "tok-is", "kind": "token", "label": "is", "x": 28, "y": 352 },
+    {
+      "id": "feat-18472",
+      "kind": "feature",
+      "feature_id": 18472,
+      "layer": 14,
+      "label": "F 18472",
+      "attribution": 0.37,
+      "activation": 4.12,
+      "x": 248,
+      "y": 12
+    },
+    {
+      "id": "feat-2201",
+      "kind": "feature",
+      "feature_id": 2201,
+      "layer": 12,
+      "label": "F 2201",
+      "attribution": 0.22,
+      "activation": 2.41,
+      "x": 248,
+      "y": 84
+    },
+    {
+      "id": "feat-4410",
+      "kind": "feature",
+      "feature_id": 4410,
+      "layer": 11,
+      "label": "F 4410",
+      "attribution": 0.19,
+      "activation": 2.18,
+      "x": 248,
+      "y": 156
+    },
+    {
+      "id": "feat-3308",
+      "kind": "feature",
+      "feature_id": 3308,
+      "layer": 16,
+      "label": "F 3308",
+      "attribution": 0.16,
+      "activation": 1.94,
+      "x": 248,
+      "y": 228
+    },
+    {
+      "id": "feat-6701",
+      "kind": "feature",
+      "feature_id": 6701,
+      "layer": 10,
+      "label": "F 6701",
+      "attribution": 0.13,
+      "activation": 1.52,
+      "x": 248,
+      "y": 300
+    },
+    {
+      "id": "feat-8834",
+      "kind": "feature",
+      "feature_id": 8834,
+      "layer": 9,
+      "label": "F 8834",
+      "attribution": 0.11,
+      "activation": 1.08,
+      "x": 248,
+      "y": 372
+    },
+    { "id": "tok-canberra", "kind": "output", "label": "Canberra", "x": 548, "y": 200 }
+  ],
+  "edges": [
+    { "source": "tok-capital", "target": "feat-2201", "weight": 0.48 },
+    { "source": "tok-capital", "target": "feat-18472", "weight": 0.18 },
+    { "source": "tok-capital", "target": "feat-6701", "weight": 0.22 },
+    { "source": "tok-australia", "target": "feat-18472", "weight": 0.41 },
+    { "source": "tok-australia", "target": "feat-4410", "weight": 0.36 },
+    { "source": "tok-australia", "target": "feat-2201", "weight": 0.16 },
+    { "source": "tok-is", "target": "feat-8834", "weight": 0.33 },
+    { "source": "feat-18472", "target": "tok-canberra", "weight": 0.52 },
+    { "source": "feat-2201", "target": "tok-canberra", "weight": 0.29 },
+    { "source": "feat-4410", "target": "tok-canberra", "weight": 0.24 },
+    { "source": "feat-3308", "target": "tok-canberra", "weight": 0.44 },
+    { "source": "feat-6701", "target": "tok-canberra", "weight": 0.18 },
+    { "source": "feat-8834", "target": "tok-canberra", "weight": 0.14 }
+  ]
+}

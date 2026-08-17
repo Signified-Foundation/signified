@@ -1,0 +1,217 @@
+{
+  "id": "gemma-fact-dallas-austin",
+  "note": "Schematic derived from a circuit-tracer / Neuronpedia export. Not a substitute for the full graph.",
+  "prompt": "Fact: The capital of the state containing Dallas is",
+  "output": "Austin",
+  "prompt_tokens": [
+    "Fact",
+    ":",
+    " The",
+    " capital",
+    " of",
+    " the",
+    " state",
+    " containing",
+    " Dallas",
+    " is"
+  ],
+  "output_tokens": [
+    " Austin"
+  ],
+  "model": "gemma-2-2b",
+  "source_graph": "gemma-fact-dallas-austin",
+  "nodes": [
+    {
+      "id": "tok-4",
+      "kind": "token",
+      "label": "capital",
+      "x": 72,
+      "y": 48
+    },
+    {
+      "id": "tok-7",
+      "kind": "token",
+      "label": "state",
+      "x": 72,
+      "y": 128
+    },
+    {
+      "id": "tok-9",
+      "kind": "token",
+      "label": "Dallas",
+      "x": 72,
+      "y": 208
+    },
+    {
+      "id": "tok-10",
+      "kind": "token",
+      "label": "is",
+      "x": 72,
+      "y": 288
+    },
+    {
+      "id": "feat-3_13984_4",
+      "kind": "feature",
+      "feature_id": 13984,
+      "layer": 3,
+      "label": "capital",
+      "attribution": 0.555,
+      "activation": 11.16,
+      "source_node_id": "3_13984_4",
+      "x": 320,
+      "y": 48
+    },
+    {
+      "id": "feat-0_13727_7",
+      "kind": "feature",
+      "feature_id": 13727,
+      "layer": 0,
+      "label": "state",
+      "attribution": 0.503,
+      "activation": 9.58,
+      "source_node_id": "0_13727_7",
+      "x": 320,
+      "y": 128
+    },
+    {
+      "id": "feat-19_7477_9",
+      "kind": "feature",
+      "feature_id": 7477,
+      "layer": 19,
+      "label": "Texas",
+      "attribution": 0.459,
+      "activation": 55.78,
+      "source_node_id": "19_7477_9",
+      "x": 320,
+      "y": 208
+    },
+    {
+      "id": "feat-19_1445_10",
+      "kind": "feature",
+      "feature_id": 1445,
+      "layer": 19,
+      "label": "preposition followed by place name",
+      "attribution": 0.382,
+      "activation": 35.45,
+      "source_node_id": "19_1445_10",
+      "x": 320,
+      "y": 288
+    },
+    {
+      "id": "feat-16_4298_10",
+      "kind": "feature",
+      "feature_id": 4298,
+      "layer": 16,
+      "label": "capital cities / say a capital city",
+      "attribution": 0.441,
+      "activation": 19.93,
+      "source_node_id": "16_4298_10",
+      "x": 320,
+      "y": 368
+    },
+    {
+      "id": "tok-output",
+      "kind": "output",
+      "label": "Austin",
+      "x": 560,
+      "y": 208
+    }
+  ],
+  "edges": [
+    {
+      "source": "tok-4",
+      "target": "feat-3_13984_4",
+      "weight": 1.0
+    },
+    {
+      "source": "tok-4",
+      "target": "feat-0_13727_7",
+      "weight": 0.01
+    },
+    {
+      "source": "tok-4",
+      "target": "feat-19_7477_9",
+      "weight": 0.47
+    },
+    {
+      "source": "tok-4",
+      "target": "feat-19_1445_10",
+      "weight": 0.86
+    },
+    {
+      "source": "tok-4",
+      "target": "feat-16_4298_10",
+      "weight": 1.0
+    },
+    {
+      "source": "tok-7",
+      "target": "feat-0_13727_7",
+      "weight": 1.0
+    },
+    {
+      "source": "tok-7",
+      "target": "feat-19_7477_9",
+      "weight": 0.63
+    },
+    {
+      "source": "tok-7",
+      "target": "feat-19_1445_10",
+      "weight": 0.22
+    },
+    {
+      "source": "tok-7",
+      "target": "feat-16_4298_10",
+      "weight": 0.42
+    },
+    {
+      "source": "tok-9",
+      "target": "feat-19_7477_9",
+      "weight": 1.0
+    },
+    {
+      "source": "tok-9",
+      "target": "feat-19_1445_10",
+      "weight": 0.17
+    },
+    {
+      "source": "tok-9",
+      "target": "feat-16_4298_10",
+      "weight": 0.13
+    },
+    {
+      "source": "tok-10",
+      "target": "feat-19_1445_10",
+      "weight": 0.16
+    },
+    {
+      "source": "tok-10",
+      "target": "feat-16_4298_10",
+      "weight": 0.29
+    },
+    {
+      "source": "feat-3_13984_4",
+      "target": "tok-output",
+      "weight": 0.11
+    },
+    {
+      "source": "feat-0_13727_7",
+      "target": "tok-output",
+      "weight": 0.03
+    },
+    {
+      "source": "feat-19_7477_9",
+      "target": "tok-output",
+      "weight": 1.0
+    },
+    {
+      "source": "feat-19_1445_10",
+      "target": "tok-output",
+      "weight": 0.27
+    },
+    {
+      "source": "feat-16_4298_10",
+      "target": "tok-output",
+      "weight": 0.77
+    }
+  ]
+}
