@@ -6,6 +6,7 @@ import { ClaimBody } from "@/components/ClaimBody";
 import { CompletionsChoice } from "@/components/CompletionsChoice";
 import { FolioMast } from "@/components/FolioMast";
 import { GraphSchematic } from "@/components/GraphSchematic";
+import { QuestionChip } from "@/components/QuestionCite";
 import { Talk } from "@/components/Talk";
 import { articleCopy, inspectCopy, neighborSentence } from "@/lib/articles";
 import { CATALOG, articleGround, folioGroundClass } from "@/lib/catalog";
@@ -155,6 +156,7 @@ export function Article({ featureId }: { featureId: number }) {
         </p>
       )}
       <p className="folio-dek">{markedDek(copy.about, copy.pull)}</p>
+      <QuestionChip featureId={featureId} />
     </header>
   );
 

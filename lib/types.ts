@@ -43,6 +43,7 @@ export type Question = {
   id: number;
   slug: string;
   text: string;
+  related_feature_ids: number[];
 };
 
 export type ReviewStance = "agrees" | "contests" | "incomplete";

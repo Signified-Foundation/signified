@@ -1,8 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import Link from "next/link";
 import { FolioMast } from "@/components/FolioMast";
+import { FeatureOverview } from "@/components/QuestionCite";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { createReview, signIn } from "@/lib/api";
 import { MODELS, RUNS } from "@/lib/models";
@@ -14,7 +14,6 @@ import {
 } from "@/lib/session";
 import type { Question, ReviewStance, User } from "@/lib/types";
 import { useActorSession } from "@/lib/useActorSession";
-import { featureSlug } from "@/lib/wiki";
 
 const STANCES: { id: ReviewStance; label: string }[] = [
   { id: "agrees", label: "Agrees" },
@@ -258,16 +257,7 @@ export function QuestionReview({ question }: { question: Question }) {
                 </section>
               )}
 
-          <p className="q-next">
-            The unit this question is not about lives on a feature page.{" "}
-            <Link href={`/wiki/${featureSlug(3102)}`} className="text-link">
-              Open Georgia
-            </Link>
-            {" · "}
-            <Link href="/articles" className="text-link">
-              All articles
-            </Link>
-          </p>
+          <FeatureOverview question={question} />
         </article>
       </div>
     </div>
