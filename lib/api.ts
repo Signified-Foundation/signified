@@ -5,6 +5,7 @@ export {
   createComment,
   createEvidence,
   createProfile,
+  createReview,
   getSession,
   retractChallenge,
   retractComment,

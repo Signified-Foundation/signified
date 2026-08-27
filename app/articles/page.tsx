@@ -10,6 +10,7 @@ import {
   catalogForRun,
 } from "@/lib/catalog";
 import { featureSlug } from "@/lib/wiki";
+import { FIRST_QUESTION, questionPath } from "@/lib/questions";
 
 export const metadata: Metadata = {
   title: "Articles · Signified",
@@ -36,6 +37,14 @@ export default function ArticlesPage() {
               {stubs ? ` · ${stubs} stub` : ""}. The wiki does not pick a winner.
             </p>
           </header>
+
+          <p className="q-index">
+            <span className="kicker">Question</span>
+            <Link href={questionPath(FIRST_QUESTION.slug)}>
+              {FIRST_QUESTION.text}
+            </Link>
+            <span>Pick a completion and review that answer.</span>
+          </p>
 
           <WikiAtlas />
 

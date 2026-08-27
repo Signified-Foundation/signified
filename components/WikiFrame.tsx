@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { CATALOG_RUNS, catalogForRun } from "@/lib/catalog";
+import { FIRST_QUESTION, questionPath } from "@/lib/questions";
 import { featureSlug } from "@/lib/wiki";
 
 export type TocItem = {
@@ -16,7 +17,7 @@ export function WikiFrame({
   ground = "paper",
   children,
 }: {
-  current?: "home" | "method" | "article" | "index" | "types" | "dictionary" | "profiles";
+  current?: "home" | "method" | "article" | "index" | "types" | "dictionary" | "profiles" | "question";
   toc: TocItem[];
   activeHref?: string;
   ground?: "field" | "paper";
@@ -29,6 +30,12 @@ export function WikiFrame({
           Signified
         </Link>
         <nav className="mast-nav" aria-label="Wiki">
+          <Link
+            href={questionPath(FIRST_QUESTION.slug)}
+            aria-current={current === "question" ? "page" : undefined}
+          >
+            Question
+          </Link>
           <Link
             href="/articles"
             aria-current={current === "index" ? "page" : undefined}

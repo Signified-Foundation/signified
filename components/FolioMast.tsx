@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import Link from "next/link";
 import { kindPhrase } from "@/lib/profile";
+import { FIRST_QUESTION, questionPath } from "@/lib/questions";
 import type { ProfilePayload, User } from "@/lib/types";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { ProfileComposer } from "@/components/ProfileComposer";
@@ -14,7 +15,7 @@ export function FolioMast({
   onLeave,
   onSetImage,
 }: {
-  current?: "articles" | "method" | "types" | "dictionary" | "interventions" | "profiles";
+  current?: "articles" | "method" | "types" | "dictionary" | "interventions" | "profiles" | "question";
   actor?: User | null;
   onCreate?: (payload: ProfilePayload) => Promise<void>;
   onLeave?: () => void;
@@ -40,6 +41,12 @@ export function FolioMast({
         Signified
       </Link>
       <nav className="mast-nav" aria-label="Wiki">
+        <Link
+          href={questionPath(FIRST_QUESTION.slug)}
+          aria-current={current === "question" ? "page" : undefined}
+        >
+          Question
+        </Link>
         <Link
           href="/articles"
           aria-current={current === "articles" ? "page" : undefined}

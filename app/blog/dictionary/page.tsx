@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BlogNav } from "@/components/BlogNav";
+import { FIRST_QUESTION, questionPath } from "@/lib/questions";
 
 export const metadata: Metadata = {
   title: "Dictionary · Signified",
@@ -148,6 +149,11 @@ export default function DictionaryPage() {
             Choice-vote for that explanation.
           </p>
           <p>
+            A third first-order act is Review: a person picks a completion of a
+            question and judges that answer. It has no path to a feature, and
+            it is not evidence.
+          </p>
+          <p>
             Georgia has one writer. You can see the completion. You cannot
             choose among writers. The Iliad line has two. Preferring Achilles
             from GPT-OSS or from ALLaM does not settle wrath versus name-token.
@@ -155,6 +161,11 @@ export default function DictionaryPage() {
           </p>
         </section>
 
+        <p>
+          <Link href={questionPath(FIRST_QUESTION.slug)} className="blog-cta">
+            Review an answer →
+          </Link>
+        </p>
         <p>
           <Link href="/wiki/feature-2104" className="blog-cta">
             Choose a response on the Iliad line →

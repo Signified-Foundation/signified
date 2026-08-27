@@ -6,7 +6,7 @@ import { useActorSession } from "@/lib/useActorSession";
 export function LiveMast({
   current,
 }: {
-  current?: "articles" | "method" | "types" | "dictionary" | "interventions" | "profiles";
+  current?: "articles" | "method" | "types" | "dictionary" | "interventions" | "profiles" | "question";
 }) {
   const { session, actor, leave, handleCreate, handleSetImage } = useActorSession();
 

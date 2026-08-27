@@ -1,4 +1,13 @@
-import type { Choice, Claim, Feature, GraphPayload, Run, Session } from "@/lib/types";
+import type {
+  Choice,
+  Claim,
+  Feature,
+  GraphPayload,
+  PromptKind,
+  Review,
+  Run,
+  Session,
+} from "@/lib/types";
 
 export function runOf(session: Session, runId: number): Run | undefined {
   return session.runs.find((item) => item.id === runId);
@@ -39,11 +48,25 @@ export function meaningStatus(
   return meaningClaim(session, feature.id)?.status ?? null;
 }
 
+export function promptKindOf(run: Run): PromptKind {
+  return run.prompt_kind ?? "lead";
+}
+
 export function writerRunsForPrompt(session: Session, prompt: string): Run[] {
   return session.runs.filter((run) => {
     if (run.prompt !== prompt) return false;
     return session.models.find((item) => item.id === run.model_id)?.role === "writer";
   });
+}
+
+export function writerRunsForQuestion(session: Session, prompt: string): Run[] {
+  return writerRunsForPrompt(session, prompt).filter(
+    (run) => promptKindOf(run) === "question",
+  );
+}
+
+export function reviewsForRun(session: Session, runId: number): Review[] {
+  return (session.reviews ?? []).filter((item) => item.run_id === runId);
 }
 
 export function choicesForPrompt(session: Session, prompt: string): Choice[] {

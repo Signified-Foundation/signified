@@ -10,7 +10,8 @@ import {
   type FixtureGraph,
 } from "@/lib/fixtures";
 import { MODELS, RUNS, SCORES } from "@/lib/models";
-import type { Claim, Comment, Feature, GraphPayload, Session } from "@/lib/types";
+import { QUESTIONS } from "@/lib/questions";
+import type { Claim, Comment, Feature, GraphPayload, Review, Session } from "@/lib/types";
 
 type GraphFile = FixtureGraph | GraphPayload;
 
@@ -48,6 +49,17 @@ const FEATURES: Feature[] = [
   ...featuresFrom(JUNG, 6, 10),
   ...featuresFrom(THANGKA, 7, 12),
   ...featuresFrom(PANOPTICON, 8, 13),
+];
+
+const REVIEWS: Review[] = [
+  {
+    id: 1,
+    run_id: 11,
+    author_id: 2,
+    stance: "contests",
+    text: "The question names a coast. Treating Georgia as the American state is a different Georgia.",
+    created_at: "2026-08-27T09:10:00.000Z",
+  },
 ];
 
 function featurePk(featureId: number) {
@@ -394,6 +406,8 @@ export const SEED: Session = {
   claims: CLAIMS,
   comments: COMMENTS,
   choices: [],
+  questions: QUESTIONS,
+  reviews: REVIEWS,
   notice: "Attribution is correlational until an intervention has been run.",
   constraint:
     "A model-generated explanation is not evidence. A human interpretation is not a fact.",

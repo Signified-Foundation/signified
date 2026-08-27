@@ -8,6 +8,7 @@ import {
   type CatalogFeature,
 } from "@/lib/catalog";
 import { MODELS, SCORES } from "@/lib/models";
+import { FIRST_QUESTION, questionPath } from "@/lib/questions";
 import { featureSlug } from "@/lib/wiki";
 
 function Entry({ item }: { item: CatalogFeature }) {
@@ -61,6 +62,7 @@ export default function Home() {
           Signified
         </Link>
         <nav className="front-nav" aria-label="Wiki">
+          <Link href={questionPath(FIRST_QUESTION.slug)}>Question</Link>
           <Link href="/articles">Articles</Link>
           <Link href="/wiki/method">Method</Link>
           <Link href="/profiles">Profiles</Link>
@@ -110,9 +112,14 @@ Signified is a place to discover them, investigate them, and see how people inte
               />
             </span>
           </p>
-          <Link href="/wiki/feature-3102" className="front-go">
-            Open a contested article
-          </Link>
+          <p className="front-doors">
+            <Link href={questionPath(FIRST_QUESTION.slug)} className="front-go">
+              Review an answer
+            </Link>
+            <Link href="/wiki/feature-3102" className="front-go is-quiet">
+              Open a contested article
+            </Link>
+          </p>
         </div>
         <HalftonePlate
           className="is-wall"

@@ -114,6 +114,22 @@ export const RUNS: Run[] = [
     output: "Achilles",
     created_at: "2026-08-17T12:08:00.000Z",
   },
+  {
+    id: 10,
+    model_id: 1,
+    prompt: "What sea does Georgia sit on?",
+    output: "The Black Sea.",
+    prompt_kind: "question",
+    created_at: "2026-08-27T09:00:00.000Z",
+  },
+  {
+    id: 11,
+    model_id: 2,
+    prompt: "What sea does Georgia sit on?",
+    output: "None. Georgia is a U.S. state.",
+    prompt_kind: "question",
+    created_at: "2026-08-27T09:01:00.000Z",
+  },
 ];
 
 export const SCORES: Score[] = [

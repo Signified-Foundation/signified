@@ -28,11 +28,32 @@ export type Model = {
   role: ModelRole;
 };
 
+export type PromptKind = "lead" | "question";
+
 export type Run = {
   id: number;
   model_id: number;
   prompt: string;
   output: string;
+  prompt_kind?: PromptKind;
+  created_at: string;
+};
+
+export type Question = {
+  id: number;
+  slug: string;
+  text: string;
+};
+
+export type ReviewStance = "agrees" | "contests" | "incomplete";
+
+/** A person's judgment of a writer’s answer. Points at a run, never at a feature. */
+export type Review = {
+  id: number;
+  run_id: number;
+  author_id: number;
+  stance: ReviewStance;
+  text: string;
   created_at: string;
 };
 
@@ -153,6 +174,8 @@ export type Session = {
   graphs: Record<number, GraphPayload>;
   scores: Score[];
   choices: Choice[];
+  questions: Question[];
+  reviews: Review[];
   observation: { id: number; graph_path: string };
   users: User[];
   features: Feature[];

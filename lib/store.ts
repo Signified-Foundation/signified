@@ -5,11 +5,12 @@ import type {
   ClaimPayload,
   EvidencePayload,
   ProfilePayload,
+  ReviewStance,
   Session,
   User,
 } from "@/lib/types";
 
-const STORAGE_KEY = "signified.session.v7";
+const STORAGE_KEY = "signified.session.v8";
 
 function clone<T>(value: T): T {
   return structuredClone(value);
@@ -49,7 +50,9 @@ function isSession(value: unknown): value is Session {
       Array.isArray(session.features) &&
       Array.isArray(session.claims) &&
       Array.isArray(session.comments) &&
-      Array.isArray(session.choices),
+      Array.isArray(session.choices) &&
+      Array.isArray(session.questions) &&
+      Array.isArray(session.reviews),
   );
 }
 
@@ -296,6 +299,51 @@ export async function createChoice(body: {
       prompt: body.prompt,
       chosen_run_id: body.chosen_run_id,
       among_run_ids: among.map((item) => item.id),
+      created_at: stamp(),
+    });
+  }
+  return save(session);
+}
+
+const REVIEW_STANCES: ReviewStance[] = ["agrees", "contests", "incomplete"];
+
+export async function createReview(body: {
+  author_id: number;
+  run_id: number;
+  stance: ReviewStance;
+  text: string;
+}): Promise<Session> {
+  const text = body.text.trim();
+  if (text.length < 8 || text.length > 500) {
+    fail("Review must be between 8 and 500 characters");
+  }
+  if (!REVIEW_STANCES.includes(body.stance)) {
+    fail("Pick whether you agree, contest, or find this incomplete");
+  }
+  const session = load();
+  if (!session.reviews) session.reviews = [];
+  const run = session.runs.find((item) => item.id === body.run_id);
+  if (!run) fail("Completion not found");
+  if ((run.prompt_kind ?? "lead") !== "question") {
+    fail("A review is of an answer, not of a lead");
+  }
+  if (!session.users.some((item) => item.id === body.author_id)) {
+    fail("Enter your name to review");
+  }
+  const existing = session.reviews.find(
+    (item) => item.author_id === body.author_id && item.run_id === body.run_id,
+  );
+  if (existing) {
+    existing.stance = body.stance;
+    existing.text = text;
+    existing.created_at = stamp();
+  } else {
+    session.reviews.push({
+      id: nextId(session.reviews),
+      run_id: body.run_id,
+      author_id: body.author_id,
+      stance: body.stance,
+      text,
       created_at: stamp(),
     });
   }
