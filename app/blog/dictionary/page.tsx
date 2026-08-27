@@ -149,9 +149,11 @@ export default function DictionaryPage() {
             Choice-vote for that explanation.
           </p>
           <p>
-            A third first-order act is Review: a person picks a completion of a
-            question and judges that answer. It has no path to a feature, and
-            it is not evidence.
+            A question is the outside view: input, writers, completions, review.
+            That Review judges an answer. It has no path to a feature, and it is
+            not evidence. A feature is the inside view: one latent unit on a
+            run, argued over. The two may cite each other. Neither owns the
+            other.
           </p>
           <p>
             Georgia has one writer. You can see the completion. You cannot

@@ -13,9 +13,9 @@ import { featureSlug } from "@/lib/wiki";
 import { FIRST_QUESTION, questionPath } from "@/lib/questions";
 
 export const metadata: Metadata = {
-  title: "Articles · Signified",
+  title: "Features · Signified",
   description:
-    "A map of the catalog. Nearby lemmas share a run or a fight. Not a measurement of the model.",
+    "Investigate what models might represent. Nearby lemmas share a run or a fight. Not a measurement of the model.",
 };
 
 export default function ArticlesPage() {
@@ -28,22 +28,23 @@ export default function ArticlesPage() {
       <div className="issue-stage is-single">
         <article className="issue">
           <header className="folio-head">
-            <p className="folio-issue">Eight runs · three writers</p>
-            <h1 className="folio-title">What happened inside the model</h1>
+            <p className="folio-issue">Inside · what this unit might represent</p>
+            <h1 className="folio-title">Explore features</h1>
             <p className="folio-by">Georgia, then the Iliad, then the rest</p>
             <p className="folio-dek">
-              Find a lemma on the map. Nearby articles share a run or a fight.
+              A feature is one latent unit that became relevant on a run. Find
+              a lemma on the map. Nearby pages share a run or a fight.
               {` ${contested} contested`}
               {stubs ? ` · ${stubs} stub` : ""}. The wiki does not pick a winner.
             </p>
           </header>
 
           <p className="q-index">
-            <span className="kicker">Question</span>
+            <span className="kicker">Outside · what the model did</span>
             <Link href={questionPath(FIRST_QUESTION.slug)}>
               {FIRST_QUESTION.text}
             </Link>
-            <span>Pick a completion and review that answer.</span>
+            <span>Review an answer. That is behavior, not a reading of a unit.</span>
           </p>
 
           <WikiAtlas />

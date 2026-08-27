@@ -85,9 +85,9 @@ export function CompletionsChoice({
 
   return (
     <section id="choice" className="choice-block" aria-label="Completions">
-      <p className="kicker">Completions · first order</p>
+      <p className="kicker">Completions · this run</p>
       <p className="choice-lead">
-        Pick a writer, then vote. A vote is a preference for a response, not a
+        Prefer a writer’s response to this lead. That is still behavior, not a
         reading of this unit.
       </p>
 

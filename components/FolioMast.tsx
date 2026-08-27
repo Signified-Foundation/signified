@@ -51,7 +51,7 @@ export function FolioMast({
           href="/articles"
           aria-current={current === "articles" ? "page" : undefined}
         >
-          Articles
+          Features
         </Link>
         <Link
           href="/wiki/method"

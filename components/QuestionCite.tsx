@@ -19,8 +19,8 @@ export function FeatureOverview({ question }: { question: Question }) {
     <section className="q-explore" aria-label="Explore inside the model">
       <p className="kicker">Explore · inside the model</p>
       <p className="q-explore-lead">
-        This question is a different task from the lead. It does not settle the
-        unit.
+        What might the model be representing when it did things like this? A
+        review of an answer does not settle the unit.
       </p>
       <ul>
         {features.map((item) => (
@@ -39,10 +39,11 @@ export function QuestionChip({ featureId }: { featureId: number }) {
 
   return (
     <aside className="q-cite" aria-label="Related question">
-      <p className="kicker">Question</p>
+      <p className="kicker">Outside · what the model did</p>
       {linked.map((item) => (
         <p key={item.id}>
-          There is a question about this lead.{" "}
+          There is a question in the same neighborhood. Reviewing those
+          answers is behavior, not a reading of this unit.{" "}
           <Link href={questionPath(item.slug)} className="text-link">
             {item.text}
           </Link>
@@ -62,7 +63,7 @@ function FeaturePeek({ item }: { item: CatalogFeature }) {
       {item.right && <p className="q-peek-b">{item.right.text}</p>}
       <p className="q-peek-hold">{item.hold}</p>
       <Link href={`/wiki/${featureSlug(item.id)}`} className="text-link">
-        See the article
+        See the feature
       </Link>
     </article>
   );

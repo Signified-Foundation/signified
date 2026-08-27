@@ -13,7 +13,7 @@ export async function generateMetadata({
   if (!question) return { title: "Question · Signified" };
   return {
     title: `${question.text} · Signified`,
-    description: "Pick a completion and review that answer.",
+    description: "What the model did. Pick a completion and review that answer.",
   };
 }
 

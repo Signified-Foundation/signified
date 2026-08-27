@@ -16,10 +16,11 @@ export default function MethodPage() {
         <p className="kicker">Method</p>
         <h1>How a reading is held</h1>
         <p className="lede">
-          The computer measures. A person interprets. Another person may contest
-          that reading. This wiki stores those as separate objects. A
-          representation can be observed. What it signifies remains something to
-          be argued over.
+          Questions are the outside view: what the model did. Features are the
+          inside view: what a unit might have been representing. The computer
+          measures. A person interprets. Another person may contest that
+          reading. A representation can be observed. What it signifies remains
+          something to be argued over.
         </p>
 
         <h2 id="loop">The loop</h2>
@@ -63,7 +64,7 @@ export default function MethodPage() {
 
         <p>
           <Link href="/wiki/feature-3102" className="text-link">
-            Open a contested article
+            Explore a contested feature
           </Link>
         </p>
       </article>

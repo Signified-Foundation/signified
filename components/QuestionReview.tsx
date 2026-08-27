@@ -127,11 +127,11 @@ export function QuestionReview({ question }: { question: Question }) {
       <div className="q-stage">
         <article className="q-page">
           <header className="q-head">
-            <p className="kicker">Question · pick a completion</p>
+            <p className="kicker">Question · what the model did</p>
             <h1 className="q-title">{question.text}</h1>
             <p className="q-dek">
-              Two writers answered. Choose one, then review that answer. This is
-              not a reading of a unit.
+              Two writers answered. Pick one completion and review that output.
+              That is behavior, not a reading of a unit.
             </p>
           </header>
 
@@ -173,10 +173,10 @@ export function QuestionReview({ question }: { question: Question }) {
           {selected && (
             <section className="q-review" aria-label="Review this answer">
               <p className="kicker">Review this answer</p>
-              <p className="q-review-who">
-                {writerLabel(selected.model_id)} wrote this. A review is of the
-                completion, not of a feature.
-              </p>
+                  <p className="q-review-who">
+                    {writerLabel(selected.model_id)} wrote this. Your review is
+                    of the completion — what the model did — not of a feature.
+                  </p>
 
                   <form className="compose q-form" onSubmit={onReview}>
                     <fieldset className="q-stances">

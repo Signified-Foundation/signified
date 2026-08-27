@@ -5,7 +5,7 @@ export const BLOG_NAV = [
   { href: "/blog/types", label: "Types", id: "types" },
   { href: "/blog/dictionary", label: "Dictionary", id: "dictionary" },
   { href: "/blog/interventions", label: "Interventions", id: "interventions" },
-  { href: "/articles", label: "Articles", id: "articles" },
+  { href: "/articles", label: "Features", id: "articles" },
   { href: "/profiles", label: "Profiles", id: "profiles" },
   { href: "/wiki/method", label: "Method", id: "method" },
 ] as const;

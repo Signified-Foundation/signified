@@ -40,7 +40,7 @@ export function WikiFrame({
             href="/articles"
             aria-current={current === "index" ? "page" : undefined}
           >
-            Articles
+            Features
           </Link>
           <Link
             href="/wiki/method"
@@ -111,7 +111,7 @@ export function WikiFrame({
               </ul>
             </div>
           ))}
-          <p className="toc-label">Articles</p>
+          <p className="toc-label">Features</p>
           <ul>
             <li>
               <Link

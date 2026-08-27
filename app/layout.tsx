@@ -23,7 +23,7 @@ const newsreader = Newsreader({
 export const metadata: Metadata = {
   title: "Signified",
   description:
-    "A Wikipedia for language model preferences and human views. Discover them, investigate them, and see how people interpret them.",
+    "Questions: what models do. Features: what they might represent.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

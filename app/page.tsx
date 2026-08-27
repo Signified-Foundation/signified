@@ -42,7 +42,7 @@ function Spine({ item }: { item: CatalogFeature }) {
         {item.right && <p className="front-b">{item.right.text}</p>}
         <p className="front-hold">{item.hold}</p>
         <Link href={`/wiki/${featureSlug(item.id)}`} className="front-go">
-          Open the article
+          Open the feature
         </Link>
       </div>
     </article>
@@ -63,7 +63,7 @@ export default function Home() {
         </Link>
         <nav className="front-nav" aria-label="Wiki">
           <Link href={questionPath(FIRST_QUESTION.slug)}>Question</Link>
-          <Link href="/articles">Articles</Link>
+          <Link href="/articles">Features</Link>
           <Link href="/wiki/method">Method</Link>
           <Link href="/profiles">Profiles</Link>
           <Link href="/blog/types">Types</Link>
@@ -77,14 +77,12 @@ export default function Home() {
         <div className="front-stage">
           <h1 className="front-title">Signified</h1>
           <p className="front-subtitle">
-            A Wikipedia for language model preferences and human views.
+            Questions: what models do. Features: what they might represent.
           </p>
           <p className="front-why">
-          
-          
-          Language models have preferences, tendencies, representations, and behaviors.
-
-Signified is a place to discover them, investigate them, and see how people interpret them.
+            Review an answer to see behavior — a question, writers, completions.
+            Open a feature to investigate one latent unit on a run. Humans
+            argue over what that unit means. The model does not name it.
           </p>
           <p className="front-acts">
             Discover{" "}
@@ -116,8 +114,8 @@ Signified is a place to discover them, investigate them, and see how people inte
             <Link href={questionPath(FIRST_QUESTION.slug)} className="front-go">
               Review an answer
             </Link>
-            <Link href="/wiki/feature-3102" className="front-go is-quiet">
-              Open a contested article
+            <Link href="/articles" className="front-go is-quiet">
+              Explore features
             </Link>
           </p>
         </div>
@@ -142,11 +140,11 @@ Signified is a place to discover them, investigate them, and see how people inte
             ))}
           </div>
           <Link href="/articles" className="front-go">
-            All articles
+            Explore features
           </Link>
         </footer>
 
-        <section className="front-entries" aria-label="Articles">
+        <section className="front-entries" aria-label="Features">
           {featured.map((item) => (
             <Spine key={item.id} item={item} />
           ))}

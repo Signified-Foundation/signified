@@ -150,7 +150,7 @@ export function WikiAtlas() {
           </div>
           <p className="issue-go">
             <Link href={`/wiki/${featureSlug(active.id)}`} className="text-link">
-              Open the article
+              Open the feature
             </Link>
           </p>
         </div>

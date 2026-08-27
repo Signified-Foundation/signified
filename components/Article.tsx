@@ -86,10 +86,6 @@ export function Article({ featureId }: { featureId: number }) {
   const selected = graph?.nodes.find((n) => n.id === selectedNode) ?? null;
   const copy = articleCopy(featureId);
   const byline = [entry?.left.by, entry?.right?.by].filter(Boolean).join(" and ");
-  const issue = String(CATALOG.findIndex((item) => item.id === featureId) + 1).padStart(
-    2,
-    "0",
-  );
 
   const statusByNode = useMemo(() => {
     if (!session || !feature) return {};
@@ -141,7 +137,7 @@ export function Article({ featureId }: { featureId: number }) {
   const head = (
     <header className="folio-head">
       <p className="folio-issue">
-        {issue} / {copy.title}
+        Feature · what this unit might represent
         {writer ? ` · ${writer}` : ""}
         {claim && contests.length > 0
           ? " · two readings"
@@ -163,11 +159,11 @@ export function Article({ featureId }: { featureId: number }) {
   const runDid =
     run && graph ? (
       <section className="run-did" aria-label="What the model did">
-        <p className="kicker">What the model did</p>
+        <p className="kicker">Observation · this run</p>
         <p className="run-did-who">
           <strong>{writer ?? "The writer"}</strong>
-          completed the prompt. It did not label the graph, and it did not file
-          a reading.
+          completed a lead. That is the occasion of this unit, not a question.
+          The writer did not label the graph, and it did not file a reading.
         </p>
         <dl className="run-did-pair">
           <div>
@@ -276,7 +272,7 @@ export function Article({ featureId }: { featureId: number }) {
             href={`/wiki/${featureSlug(jumpId)}`}
             className={`text-link${selectedClaim ? "" : " is-stub"}`}
           >
-            {selectedClaim ? "Open the article" : "No article yet"}
+            {selectedClaim ? "Open the feature" : "No feature yet"}
           </Link>
         </p>
       )}
@@ -288,7 +284,7 @@ export function Article({ featureId }: { featureId: number }) {
   const graphRail = (
     <aside className="float-rail" aria-label="Graph and notes">
       <section id="attribution" className="float-card is-graph">
-        <p className="kicker">Graph · a measurement</p>
+        <p className="kicker">Graph · inside this run</p>
         {graph ? (
           <>
             <GraphSchematic
