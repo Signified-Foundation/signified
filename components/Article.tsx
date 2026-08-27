@@ -11,7 +11,6 @@ import { Talk } from "@/components/Talk";
 import { articleCopy, inspectCopy, neighborSentence } from "@/lib/articles";
 import { CATALOG, articleGround, folioGroundClass } from "@/lib/catalog";
 import { createClaim, retractChallenge, retractComment } from "@/lib/api";
-import { kindPhrase } from "@/lib/profile";
 import { useActorSession } from "@/lib/useActorSession";
 import { wordFor } from "@/lib/reading";
 import {
@@ -21,15 +20,14 @@ import {
   runOf,
   weightClaims,
   writerNameOf,
-  writerRunsForPrompt,
 } from "@/lib/session";
 import type { GraphNode } from "@/lib/types";
 import { featureSlug } from "@/lib/wiki";
 
 function kindLabel(node: GraphNode) {
-  if (node.kind === "feature") return "Internal unit · not a word the model wrote";
-  if (node.kind === "output") return "Output token · the model wrote this";
-  return "Prompt token · given to the model";
+  if (node.kind === "feature") return "Feature";
+  if (node.kind === "output") return "Output";
+  return "Prompt";
 }
 
 function markedDek(about: string, pull: string): ReactNode {
@@ -130,14 +128,11 @@ export function Article({ featureId }: { featureId: number }) {
   }
 
   const contests = claim?.challenges ?? [];
-  const siblingWriters =
-    session && run ? writerRunsForPrompt(session, run.prompt) : [];
-  const canChoose = siblingWriters.length >= 2;
 
   const head = (
     <header className="folio-head">
       <p className="folio-issue">
-        Feature · what this unit might represent
+        Feature
         {writer ? ` · ${writer}` : ""}
         {claim && contests.length > 0
           ? " · two readings"
@@ -148,7 +143,7 @@ export function Article({ featureId }: { featureId: number }) {
       <h1 className="folio-title">{entry?.lemma ?? copy.title}</h1>
       {byline && (
         <p className="folio-by">
-          {byline} <span className="folio-by-kind">· people, not the model</span>
+          {byline}
         </p>
       )}
       <p className="folio-dek">{markedDek(copy.about, copy.pull)}</p>
@@ -158,13 +153,8 @@ export function Article({ featureId }: { featureId: number }) {
 
   const runDid =
     run && graph ? (
-      <section className="run-did" aria-label="What the model did">
-        <p className="kicker">Observation · this run</p>
-        <p className="run-did-who">
-          <strong>{writer ?? "The writer"}</strong>
-          completed a lead. That is the occasion of this unit, not a question.
-          The writer did not label the graph, and it did not file a reading.
-        </p>
+      <section className="run-did" aria-label="This run">
+        <p className="kicker">This run</p>
         <dl className="run-did-pair">
           <div>
             <dt>Given</dt>
@@ -175,65 +165,8 @@ export function Article({ featureId }: { featureId: number }) {
             <dd>{run.output}</dd>
           </div>
         </dl>
-        <ul className="run-did-key">
-          <li>Left · prompt tokens</li>
-          <li>Middle · features</li>
-          <li>Right · the output</li>
-        </ul>
-        <p className="run-did-note">
-          The graph is a fixture of this run, not live circuit-tracer. The
-          writer did not draw it. Features are not extra tokens.
-        </p>
       </section>
     ) : null;
-
-  const personDoes = (
-    <nav className="person-does" aria-label="What a person does">
-      <p className="kicker">What a person does</p>
-      <p className="person-does-who">
-        {actor ? (
-          <>
-            You are {actor.name}, {kindPhrase(actor)}. Not the writer on this
-            run.
-          </>
-        ) : (
-          <>
-            <a href="#login">Enter</a> as a person, or create an agent, to vote
-            or file a reading.
-          </>
-        )}
-      </p>
-      <ol>
-        <li>
-          <a href="#choice">
-            {canChoose ? "Choose a response" : "See the completions"}
-          </a>
-          {canChoose
-            ? " — which writer’s completion you prefer. That is not a reading of this unit."
-            : ". A choice needs two writers. This lead has one."}
-        </li>
-        {!claim ? (
-          <li>
-            <a href="#readings">File a reading</a> of this unit — a hypothesis,
-            not a caption from the model.
-          </li>
-        ) : (
-          <li>
-            <a href="#readings">File another reading</a>
-            {contests.length === 0
-              ? ". This article is waiting for a second person."
-              : ". Both stay. The page does not pick a winner."}
-          </li>
-        )}
-        <li>
-          <a href="#thread">Reply in the thread</a>. A comment is not evidence.
-        </li>
-        <li>
-          <a href="#evidence">Attach a number</a> only if you ran the test.
-        </li>
-      </ol>
-    </nav>
-  );
 
   const neighbors = selected
     ? graph?.edges
@@ -284,27 +217,21 @@ export function Article({ featureId }: { featureId: number }) {
   const graphRail = (
     <aside className="float-rail" aria-label="Graph and notes">
       <section id="attribution" className="float-card is-graph">
-        <p className="kicker">Graph · inside this run</p>
+        <p className="kicker">Graph</p>
         {graph ? (
-          <>
-            <GraphSchematic
-              key={feature?.run_id ?? "graph"}
-              nodes={graph.nodes}
-              edges={graph.edges}
-              selectedId={selectedNode}
-              statusByNode={statusByNode}
-              savedRead={savedRead}
-              pendingSave={pendingSave}
-              onSelect={setSelectedNode}
-              onSaveRead={actor ? saveReading : undefined}
-              asName={actor?.name}
-            />
-            <p className="float-caption">
-              The writer did not draw this. A tracer measured which given
-              tokens and internal units wrote into the output. Observed stays on
-              the node. The words are a person’s local weight, not a meaning.
-            </p>
-          </>
+          <GraphSchematic
+            compact
+            key={feature?.run_id ?? "graph"}
+            nodes={graph.nodes}
+            edges={graph.edges}
+            selectedId={selectedNode}
+            statusByNode={statusByNode}
+            savedRead={savedRead}
+            pendingSave={pendingSave}
+            onSelect={setSelectedNode}
+            onSaveRead={actor ? saveReading : undefined}
+            asName={actor?.name}
+          />
         ) : (
           <p className="quiet">Loading the graph…</p>
         )}
@@ -358,7 +285,7 @@ export function Article({ featureId }: { featureId: number }) {
           onActor={become}
         />
       )}
-      {personDoes}
+      )}
       <ClaimBody
         session={session}
         actor={actor}

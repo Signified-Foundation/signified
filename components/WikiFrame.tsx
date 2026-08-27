@@ -17,7 +17,7 @@ export function WikiFrame({
   ground = "paper",
   children,
 }: {
-  current?: "home" | "method" | "article" | "index" | "types" | "dictionary" | "profiles" | "question";
+  current?: "home" | "method" | "article" | "index" | "types" | "dictionary" | "profiles" | "question" | "research";
   toc: TocItem[];
   activeHref?: string;
   ground?: "field" | "paper";
@@ -47,6 +47,12 @@ export function WikiFrame({
             aria-current={current === "method" ? "page" : undefined}
           >
             Method
+          </Link>
+          <Link
+            href="/research"
+            aria-current={current === "research" ? "page" : undefined}
+          >
+            Research
           </Link>
           <Link
             href="/profiles"

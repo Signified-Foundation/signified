@@ -3,7 +3,7 @@
 import { FormEvent, type ReactNode, useState } from "react";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { createComment } from "@/lib/api";
-import { kindPhrase, resolveUser } from "@/lib/profile";
+import { resolveUser } from "@/lib/profile";
 import type { Comment, Session } from "@/lib/types";
 
 function when(iso: string) {
@@ -48,8 +48,7 @@ function Thread({
             <p className="thread-who">
               <ProfileAvatar user={who} size="s" />
               <strong>{who.name}</strong>
-              <span>{kindPhrase(who)}</span>
-              {parentAuthor ? <span>replied to {parentAuthor}</span> : null}
+              {parentAuthor ? <span>to {parentAuthor}</span> : null}
               <span>{when(item.created_at)}</span>
             </p>
             <p className="thread-body">{item.text}</p>
@@ -159,7 +158,7 @@ export function Talk({
         </p>
       )}
       {actor.kind === "agent" && (
-        <p className="quiet">Commenting as an agent. Not evidence.</p>
+        <p className="quiet">Agent</p>
       )}
       <textarea
         name="text"
@@ -175,17 +174,10 @@ export function Talk({
 
   return (
     <section id="talk" className="talk-section">
-      <h2>
-        Talk
-        <span className="section-note">
-          A comment is not a reading. File readings above. A comment is not
-          evidence.
-        </span>
-      </h2>
+      <h2>Talk</h2>
 
       <div id="thread" className="talk-thread">
-        <p className="kicker">Thread</p>
-        {comments.length === 0 && <p className="quiet">No comments yet.</p>}
+        {comments.length === 0 && <p className="quiet">No comments yet</p>}
         <Thread
           comments={comments}
           parentId={null}

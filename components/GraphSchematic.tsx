@@ -12,6 +12,7 @@ type Props = {
   savedRead?: Record<string, number>;
   pendingSave?: boolean;
   asName?: string;
+  compact?: boolean;
   onSelect: (nodeId: string) => void;
   onSaveRead?: (nodeId: string, weight: number) => void;
 };
@@ -33,10 +34,11 @@ function seedWeight(node: GraphNode) {
   return 0.18;
 }
 
-function radius(kind: GraphNode["kind"], observed: number) {
-  if (kind === "feature") return 5 + observed * 12;
-  if (kind === "output") return 6;
-  return 4;
+function radius(kind: GraphNode["kind"], observed: number, compact: boolean) {
+  const s = compact ? 0.72 : 1;
+  if (kind === "feature") return (5 + observed * 12) * s;
+  if (kind === "output") return 6 * s;
+  return 4 * s;
 }
 
 function shortLabel(node: GraphNode) {
@@ -47,15 +49,18 @@ function shortLabel(node: GraphNode) {
 function layout(
   nodes: GraphNode[],
   weights: Record<string, number>,
-): { placed: Placed[]; height: number } {
+  compact: boolean,
+): { placed: Placed[]; height: number; width: number } {
+  const width = compact ? 400 : WIDTH;
+  const pad = compact ? 14 : PAD;
   const minX = Math.min(...nodes.map((n) => n.x));
   const maxX = Math.max(...nodes.map((n) => n.x));
   const minY = Math.min(...nodes.map((n) => n.y));
   const maxY = Math.max(...nodes.map((n) => n.y));
   const spanX = Math.max(maxX - minX, 1);
   const spanY = Math.max(maxY - minY, 1);
-  const scale = (WIDTH - PAD * 2) / spanX;
-  const height = Math.max(168, spanY * scale + PAD * 2);
+  const scale = (width - pad * 2) / spanX;
+  const height = Math.max(compact ? 120 : 168, spanY * scale + pad * 2);
 
   const placed = nodes.map((node) => {
     const observed = seedWeight(node);
@@ -64,13 +69,13 @@ function layout(
       ...node,
       observed,
       weight,
-      r: radius(node.kind, observed),
-      px: PAD + (node.x - minX) * scale,
-      py: PAD + (node.y - minY) * scale,
+      r: radius(node.kind, observed, compact),
+      px: pad + (node.x - minX) * scale,
+      py: pad + (node.y - minY) * scale,
     };
   });
 
-  return { placed, height };
+  return { placed, height, width };
 }
 
 export function GraphSchematic({
@@ -81,6 +86,7 @@ export function GraphSchematic({
   savedRead = {},
   pendingSave = false,
   asName,
+  compact = false,
   onSelect,
   onSaveRead,
 }: Props) {
@@ -92,9 +98,9 @@ export function GraphSchematic({
     return next;
   });
 
-  const { placed, height } = useMemo(
-    () => layout(nodes, weights),
-    [nodes, weights],
+  const { placed, height, width } = useMemo(
+    () => layout(nodes, weights, compact),
+    [nodes, weights, compact],
   );
   const byId = useMemo(
     () => Object.fromEntries(placed.map((node) => [node.id, node])),
@@ -110,15 +116,15 @@ export function GraphSchematic({
   }
 
   return (
-    <div className="graph-wrap">
-      <ul className="graph-key" aria-label="What the dots are">
-        <li className="is-token">Prompt · given</li>
-        <li className="is-feature">Feature · internal</li>
-        <li className="is-output">Output · written</li>
+    <div className={`graph-wrap${compact ? " is-compact" : ""}`}>
+      <ul className="graph-key" aria-label="Graph">
+        <li className="is-token">{compact ? "Prompt" : "Prompt · given"}</li>
+        <li className="is-feature">{compact ? "Feature" : "Feature · internal"}</li>
+        <li className="is-output">{compact ? "Output" : "Output · written"}</li>
       </ul>
       <svg
         className="graph"
-        viewBox={`0 0 ${WIDTH} ${height}`}
+        viewBox={`0 0 ${width} ${height}`}
         role="img"
         aria-label="Measurement of the run. Prompt tokens the model was given, internal features that were active, and the output token it wrote."
       >
@@ -179,7 +185,7 @@ export function GraphSchematic({
               <text className="graph-label" x={node.r + 7} y={3}>
                 {shortLabel(node)}
               </text>
-              {node.kind === "feature" && (
+              {node.kind === "feature" && !compact && (
                 <text className="graph-meta" x={node.r + 7} y={16}>
                   {node.observed.toFixed(2)} obs
                   {read != null ? ` · ${wordFor(read)}` : ""}
@@ -190,11 +196,10 @@ export function GraphSchematic({
         })}
       </svg>
 
-      {canWeigh && selected && (
+      {canWeigh && selected && !compact && (
         <div className="graph-weight">
           <p className="graph-weight-lead">
-            How much this internal unit matters on this run, as {asName ?? "a person"}.
-            Not a meaning, and not a measurement.
+            Weight on this run{asName ? ` · ${asName}` : ""}.
           </p>
           <div className="graph-words" role="group" aria-label="Reading words">
             {READING_WORDS.map((item) => (

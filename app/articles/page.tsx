@@ -40,11 +40,10 @@ export default function ArticlesPage() {
           </header>
 
           <p className="q-index">
-            <span className="kicker">Outside · what the model did</span>
+            <span className="kicker">Question</span>
             <Link href={questionPath(FIRST_QUESTION.slug)}>
               {FIRST_QUESTION.text}
             </Link>
-            <span>Review an answer. That is behavior, not a reading of a unit.</span>
           </p>
 
           <WikiAtlas />

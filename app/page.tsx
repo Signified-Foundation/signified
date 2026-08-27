@@ -65,6 +65,7 @@ export default function Home() {
           <Link href={questionPath(FIRST_QUESTION.slug)}>Question</Link>
           <Link href="/articles">Features</Link>
           <Link href="/wiki/method">Method</Link>
+          <Link href="/research">Research</Link>
           <Link href="/profiles">Profiles</Link>
           <Link href="/blog/types">Types</Link>
           <Link href="/blog/dictionary">Dictionary</Link>

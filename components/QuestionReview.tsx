@@ -1,13 +1,21 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
+import { CompactGraph } from "@/components/CompactGraph";
 import { FolioMast } from "@/components/FolioMast";
-import { FeatureOverview } from "@/components/QuestionCite";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { createReview, signIn } from "@/lib/api";
 import { MODELS, RUNS } from "@/lib/models";
-import { kindPhrase, resolveUser } from "@/lib/profile";
 import {
+  catalogFeature,
+  featureHref,
+  HATNOTE_FEATURE_ID,
+  seeAlsoForTrial,
+} from "@/lib/research";
+import { resolveUser } from "@/lib/profile";
+import {
+  graphOf,
   modelNameOf,
   reviewsForRun,
   writerRunsForQuestion,
@@ -67,6 +75,11 @@ export function QuestionReview({ question }: { question: Question }) {
           (item) => item.author_id === actor.id,
         )
       : undefined;
+  const graph =
+    session && selected ? (graphOf(session, selected.id) ?? null) : null;
+  const hatnote = catalogFeature(HATNOTE_FEATURE_ID);
+  const seeAlso = seeAlsoForTrial("question");
+  const sameSea = selected ? /black sea/i.test(selected.output) : false;
 
   function writerLabel(modelId: number) {
     if (session) return modelNameOf(session, modelId) ?? "Writer";
@@ -124,25 +137,17 @@ export function QuestionReview({ question }: { question: Question }) {
         onLeave={session ? leave : undefined}
         onSetImage={session && actor ? handleSetImage : undefined}
       />
-      <div className="q-stage">
-        <article className="q-page">
-          <header className="q-head">
-            <p className="kicker">Question · what the model did</p>
-            <h1 className="q-title">{question.text}</h1>
-            <p className="q-dek">
-              Two writers answered. Pick one completion and review that output.
-              That is behavior, not a reading of a unit.
-            </p>
+      <div className="rs-stage">
+        <article className="rs-page">
+          <header className="rs-head">
+            <p className="kicker">Question</p>
+            <h1 className="rs-title">{question.text}</h1>
           </header>
 
           {banner && <p className="form-error">{banner}</p>}
 
-          <div
-            className="q-picks"
-            role="radiogroup"
-            aria-label="Completions"
-          >
-            {writers.map((run) => {
+          <div className="q-picks" role="radiogroup" aria-label="Writers">
+            {writers.map((run, index) => {
               const active = selected?.id === run.id;
               const count = session
                 ? reviewsForRun(session, run.id).length
@@ -150,7 +155,9 @@ export function QuestionReview({ question }: { question: Question }) {
               return (
                 <label
                   key={run.id}
-                  className={`q-pick${active ? " is-selected" : ""}`}
+                  className={`q-pick${active ? " is-selected" : ""}${
+                    index % 2 ? " is-alt" : ""
+                  }`}
                 >
                   <input
                     type="radio"
@@ -158,12 +165,15 @@ export function QuestionReview({ question }: { question: Question }) {
                     checked={active}
                     onChange={() => setSelectedId(run.id)}
                   />
-                  <span className="q-pick-writer">{writerLabel(run.model_id)}</span>
+                  <span className="q-pick-writer">
+                    {writerLabel(run.model_id)}
+                  </span>
                   <span className="q-pick-output">{run.output}</span>
                   <span className="q-pick-meta">
+                    Run {run.id}
                     {count === 0
-                      ? "No reviews yet"
-                      : `${count} ${count === 1 ? "review" : "reviews"}`}
+                      ? " · no reviews"
+                      : ` · ${count} ${count === 1 ? "review" : "reviews"}`}
                   </span>
                 </label>
               );
@@ -171,93 +181,129 @@ export function QuestionReview({ question }: { question: Question }) {
           </div>
 
           {selected && (
-            <section className="q-review" aria-label="Review this answer">
-              <p className="kicker">Review this answer</p>
-                  <p className="q-review-who">
-                    {writerLabel(selected.model_id)} wrote this. Your review is
-                    of the completion — what the model did — not of a feature.
-                  </p>
-
-                  <form className="compose q-form" onSubmit={onReview}>
-                    <fieldset className="q-stances">
-                      <legend>Stance</legend>
-                      {STANCES.map((item) => (
-                        <label key={item.id}>
-                          <input
-                            type="radio"
-                            name="stance"
-                            checked={stance === item.id}
-                            onChange={() => setStance(item.id)}
-                          />
-                          {item.label}
-                        </label>
-                      ))}
-                    </fieldset>
-
-                    <label>
-                      Your reading of this answer
-                      <textarea
-                        name="text"
-                        required
-                        minLength={8}
-                        maxLength={500}
-                        rows={3}
-                        value={text}
-                        onChange={(event) => setText(event.target.value)}
-                        placeholder="What does this completion get right or wrong?"
-                      />
-                    </label>
-
-                    {!actor && (
-                      <label>
-                        Your name
-                        <input
-                          name="name"
-                          required
-                          minLength={2}
-                          maxLength={40}
-                          autoComplete="nickname"
-                          placeholder="What should we call you?"
-                        />
-                      </label>
-                    )}
-
-                    <button
-                      className="btn-solid"
-                      type="submit"
-                      disabled={pending || !session}
-                    >
-                      {mine
-                        ? `Update review${actor ? ` as ${actor.name}` : ""}`
-                        : "Review this answer"}
-                    </button>
-                  </form>
-
-                  <ol className="q-reviews">
-                    {reviews.length === 0 && (
-                      <li className="quiet">No reviews of this answer yet.</li>
-                    )}
-                    {session &&
-                      reviews.map((item) => {
-                        const who = resolveUser(session.users, item.author_id);
-                        return (
-                          <li key={item.id}>
-                            <p className="thread-who">
-                              <ProfileAvatar user={who} size="s" />
-                              <strong>{who.name}</strong>
-                              <span>{kindPhrase(who)}</span>
-                              <span>{stanceLabel(item.stance)}</span>
-                              <span>{when(item.created_at)}</span>
-                            </p>
-                            <p className="thread-body">{item.text}</p>
-                          </li>
-                        );
-                      })}
-                  </ol>
-                </section>
+            <aside className="rs-hatnote" aria-label="Disambiguation">
+              This answer is {writerLabel(selected.model_id)} on this question.{" "}
+              {sameSea ? (
+                <>For the continuation that also wrote “Black Sea,” see </>
+              ) : (
+                <>
+                  For the continuation where Georgia was read as country versus
+                  name-token, see{" "}
+                </>
               )}
+              <Link href={featureHref(HATNOTE_FEATURE_ID)}>
+                {hatnote?.label ?? `Feature ${HATNOTE_FEATURE_ID}`}
+              </Link>
+              . That trial is not this one.
+            </aside>
+          )}
 
-          <FeatureOverview question={question} />
+          {selected && (
+            <CompactGraph
+              key={selected.id}
+              runId={selected.id}
+              writer={writerLabel(selected.model_id)}
+              graph={graph}
+            />
+          )}
+
+          {selected && (
+            <section className="rs-reviews" aria-label="Reviews">
+              <p className="kicker">
+                Reviews · {writerLabel(selected.model_id)}
+              </p>
+              <form className="compose q-form" onSubmit={onReview}>
+                <fieldset className="q-stances">
+                  <legend>Stance</legend>
+                  {STANCES.map((item) => (
+                    <label
+                      key={item.id}
+                      className={stance === item.id ? "is-on" : undefined}
+                    >
+                      <input
+                        type="radio"
+                        name="stance"
+                        checked={stance === item.id}
+                        onChange={() => setStance(item.id)}
+                      />
+                      {item.label}
+                    </label>
+                  ))}
+                </fieldset>
+
+                <label>
+                  Review
+                  <textarea
+                    name="text"
+                    required
+                    minLength={8}
+                    maxLength={500}
+                    rows={2}
+                    value={text}
+                    onChange={(event) => setText(event.target.value)}
+                  />
+                </label>
+
+                {!actor && (
+                  <label>
+                    Name
+                    <input
+                      name="name"
+                      required
+                      minLength={2}
+                      maxLength={40}
+                      autoComplete="nickname"
+                    />
+                  </label>
+                )}
+
+                <button
+                  className="btn-solid"
+                  type="submit"
+                  disabled={pending || !session}
+                >
+                  {mine ? "Update" : "Review"}
+                </button>
+              </form>
+
+              <ol className="thread">
+                {reviews.length === 0 && (
+                  <li className="quiet">No reviews yet</li>
+                )}
+                {session &&
+                  reviews.map((item) => {
+                    const who = resolveUser(session.users, item.author_id);
+                    return (
+                      <li key={item.id} className="thread-item">
+                        <p className="thread-who">
+                          <ProfileAvatar user={who} size="s" />
+                          <strong>{who.name}</strong>
+                          <span>{stanceLabel(item.stance)}</span>
+                          <span>{when(item.created_at)}</span>
+                        </p>
+                        <p className="thread-body">{item.text}</p>
+                      </li>
+                    );
+                  })}
+              </ol>
+            </section>
+          )}
+
+          {seeAlso.length > 0 && (
+            <nav className="rs-also" aria-labelledby="q-also">
+              <p className="kicker" id="q-also">
+                See also
+              </p>
+              <ul>
+                {seeAlso.map((item) => (
+                  <li key={item.id}>
+                    <Link href={featureHref(item.id)}>{item.label}</Link>
+                    <span>{item.lemma}</span>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
         </article>
       </div>
     </div>

@@ -15,7 +15,7 @@ export function FolioMast({
   onLeave,
   onSetImage,
 }: {
-  current?: "articles" | "method" | "types" | "dictionary" | "interventions" | "profiles" | "question";
+  current?: "articles" | "method" | "types" | "dictionary" | "interventions" | "profiles" | "question" | "research";
   actor?: User | null;
   onCreate?: (payload: ProfilePayload) => Promise<void>;
   onLeave?: () => void;
@@ -58,6 +58,12 @@ export function FolioMast({
           aria-current={current === "method" ? "page" : undefined}
         >
           Method
+        </Link>
+        <Link
+          href="/research"
+          aria-current={current === "research" ? "page" : undefined}
+        >
+          Research
         </Link>
         <Link
           href="/profiles"

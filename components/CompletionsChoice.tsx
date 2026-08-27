@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import Link from "next/link";
 import { createChoice, signIn } from "@/lib/api";
 import {
   choiceTally,
@@ -32,8 +31,6 @@ export function CompletionsChoice({
     ? choices.find((item) => item.author_id === actor.id)
     : undefined;
   const canChoose = writers.length >= 2;
-  const sameOutput =
-    writers.length > 1 && writers.every((run) => run.output === writers[0].output);
   const [selectedId, setSelectedId] = useState(
     mine?.chosen_run_id ?? graphRunId,
   );
@@ -43,9 +40,6 @@ export function CompletionsChoice({
   const selected =
     writers.find((run) => run.id === selectedId) ?? writers[0] ?? null;
   const alreadyThis = Boolean(selected && mine?.chosen_run_id === selected.id);
-  const selectedTally = selected
-    ? choiceTally(session, prompt, selected.id)
-    : 0;
 
   async function onVote(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -78,66 +72,58 @@ export function CompletionsChoice({
 
   function voteLabel() {
     if (!canChoose) return "Needs two writers";
-    if (alreadyThis) return `Voted for this response${actor ? ` as ${actor.name}` : ""}`;
-    if (mine) return "Change vote to this response";
-    return "Vote for this response";
+    if (alreadyThis) return "Voted";
+    if (mine) return "Change vote";
+    return "Vote";
   }
 
   return (
     <section id="choice" className="choice-block" aria-label="Completions">
-      <p className="kicker">Completions · this run</p>
-      <p className="choice-lead">
-        Prefer a writer’s response to this lead. That is still behavior, not a
-        reading of this unit.
-      </p>
+      <p className="kicker">Completions</p>
+
+      <div className="q-picks" role="radiogroup" aria-label="Writers">
+        {writers.map((run, index) => {
+          const on = selected?.id === run.id;
+          const tally = choiceTally(session, prompt, run.id);
+          const name = modelNameOf(session, run.model_id) ?? "Writer";
+          return (
+            <label
+              key={run.id}
+              className={`q-pick${on ? " is-selected" : ""}${
+                index % 2 ? " is-alt" : ""
+              }`}
+            >
+              <input
+                type="radio"
+                name="choice-run"
+                checked={on}
+                onChange={() => setSelectedId(run.id)}
+              />
+              <span className="q-pick-writer">{name}</span>
+              <span className="q-pick-output">{run.output}</span>
+              <span className="q-pick-meta">
+                Run {run.id}
+                {run.id === graphRunId ? " · this graph" : ""}
+                {tally === 0
+                  ? " · no votes"
+                  : ` · ${tally} ${tally === 1 ? "vote" : "votes"}`}
+              </span>
+            </label>
+          );
+        })}
+      </div>
 
       {selected && (
         <form className="choice-form" onSubmit={onVote}>
-          <label>
-            Model completion
-            <select
-              name="run_id"
-              value={selected.id}
-              onChange={(event) => setSelectedId(Number(event.target.value))}
-            >
-              {writers.map((run) => {
-                const name = modelNameOf(session, run.model_id) ?? "Writer";
-                const graph = run.id === graphRunId ? " · this graph" : "";
-                return (
-                  <option key={run.id} value={run.id}>
-                    {name} — {run.output}
-                    {graph}
-                  </option>
-                );
-              })}
-            </select>
-          </label>
-
-          <dl className="run-did-pair is-preview">
-            <div className="is-wrote">
-              <dt>Wrote</dt>
-              <dd>{selected.output}</dd>
-            </div>
-          </dl>
-          <p className="choice-meta">
-            {modelNameOf(session, selected.model_id)}
-            {selected.id === graphRunId ? " · this graph" : " · no graph"}
-            {" · "}
-            {selectedTally === 0
-              ? "no votes yet"
-              : `${selectedTally} ${selectedTally === 1 ? "vote" : "votes"}`}
-          </p>
-
           {!actor && canChoose && (
             <label>
-              Your name
+              Name
               <input
                 name="name"
                 required
                 minLength={2}
                 maxLength={40}
                 autoComplete="nickname"
-                placeholder="What should we call you?"
               />
             </label>
           )}
@@ -152,50 +138,19 @@ export function CompletionsChoice({
             </button>
             {mine && (
               <p className="choice-cast">
-                {actor?.name} voted for{" "}
+                {actor?.name} ·{" "}
                 {modelNameOf(
                   session,
-                  writers.find((run) => run.id === mine.chosen_run_id)?.model_id ??
-                    0,
+                  writers.find((run) => run.id === mine.chosen_run_id)
+                    ?.model_id ?? 0,
                 )}
-                .
               </p>
             )}
           </div>
         </form>
       )}
 
-      {writers.length > 1 && (
-        <ul className="choice-tally">
-          {writers.map((run) => (
-            <li key={run.id}>
-              {modelNameOf(session, run.model_id)}
-              <span>{choiceTally(session, prompt, run.id)}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-
       {error && <p className="form-error">{error}</p>}
-      <p className="choice-note">
-        {canChoose ? (
-          <>
-            A tally is not evidence.
-            {sameOutput ? " Both of these writers wrote the same word." : ""} The
-            graph on the right measures one run. The other model is another
-            writer, not the same feature.
-          </>
-        ) : (
-          <>
-            A vote needs two writers on this lead. This one has a single writer.
-            The Iliad line has two:{" "}
-            <Link href="/wiki/feature-2104" className="text-link">
-              wrath / Feature 2104
-            </Link>
-            .
-          </>
-        )}
-      </p>
     </section>
   );
 }
