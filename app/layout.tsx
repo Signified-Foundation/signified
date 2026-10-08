@@ -23,7 +23,7 @@ const newsreader = Newsreader({
 export const metadata: Metadata = {
   title: "Signified",
   description:
-    "Questions: what models do. Features: what they might represent.",
+    "A wiki for understanding how AI models behave. Explore model responses, look at the evidence, and compare explanations.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

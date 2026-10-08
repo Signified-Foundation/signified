@@ -2,9 +2,9 @@
 
 import { FormEvent, type ReactNode, useState } from "react";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
-import { createComment } from "@/lib/api";
+import { createComment, signIn } from "@/lib/api";
 import { resolveUser } from "@/lib/profile";
-import type { Comment, Session } from "@/lib/types";
+import type { Comment, Session, User } from "@/lib/types";
 
 function when(iso: string) {
   const date = new Date(iso.includes("T") ? iso : iso.replace(" ", "T") + "Z");
@@ -48,6 +48,7 @@ function Thread({
             <p className="thread-who">
               <ProfileAvatar user={who} size="s" />
               <strong>{who.name}</strong>
+              {who.kind === "agent" ? <span>adds context</span> : null}
               {parentAuthor ? <span>to {parentAuthor}</span> : null}
               <span>{when(item.created_at)}</span>
             </p>
@@ -92,13 +93,21 @@ export function Talk({
   featurePk,
   actorId,
   onSession,
+  onBecome,
   onRetractComment,
+  title = "Talk",
+  lead,
+  variant = "talk",
 }: {
   session: Session;
   featurePk: number;
   actorId: number | null;
   onSession: (session: Session) => void;
+  onBecome?: (user: User) => void;
   onRetractComment?: (id: number) => void;
+  title?: string;
+  lead?: string;
+  variant?: "talk" | "anti";
 }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -110,15 +119,22 @@ export function Talk({
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (actorId == null) return;
     const form = event.currentTarget;
     const text = String(new FormData(form).get("text") ?? "");
+    const typed = String(new FormData(form).get("name") ?? "");
     setPending(true);
     setError(null);
     try {
+      let user = actor ?? undefined;
+      if (!user) {
+        const signed = await signIn(typed);
+        user = signed.user;
+        onSession(signed.session);
+        onBecome?.(user);
+      }
       const next = await createComment({
         feature_pk: featurePk,
-        author_id: actorId,
+        author_id: user.id,
         text,
         parent_id: replyTo,
       });
@@ -132,49 +148,76 @@ export function Talk({
     }
   }
 
-  const commentForm =
-    !actor ? (
-      <p className="quiet">
-        <a href="#login" className="text-link">
-          Enter
-        </a>{" "}
-        to comment.
-      </p>
-    ) : actor ? (
+  const commentForm = (
     <form className="comment-form" onSubmit={onSubmit}>
       <div className="comment-bar">
         <p className="actors">
-          <ProfileAvatar user={actor} size="s" />
-          As {actor.name}
+          {actor ? (
+            <>
+              <ProfileAvatar user={actor} size="s" />
+              As {actor.name}
+            </>
+          ) : (
+            "As a person"
+          )}
         </p>
         <button className="btn-solid" disabled={pending} type="submit">
-          {replyTo ? "Reply" : "Post"}
+          {replyTo ? "Continue" : variant === "anti" ? "Add" : "Post"}
         </button>
       </div>
-      {replyParent && (
+      {replyParent && actor && (
         <p className="comment-replying">
           {actor.name} replying to{" "}
           {resolveUser(session.users, replyParent.author_id).name}
         </p>
       )}
-      {actor.kind === "agent" && (
-        <p className="quiet">Agent</p>
+      {actor?.kind === "agent" && (
+        <p className="quiet">Agent · adds context, not evidence</p>
+      )}
+      {!actor && (
+        <label>
+          Name
+          <input
+            name="name"
+            required
+            minLength={2}
+            maxLength={40}
+            autoComplete="nickname"
+            placeholder="Your name"
+          />
+        </label>
       )}
       <textarea
         name="text"
         required
         minLength={2}
         rows={2}
-        aria-label={replyTo ? "Reply" : "Comment"}
-        placeholder={replyTo ? "Write a reply" : "Write a comment"}
+        aria-label={
+          replyTo
+            ? "Continue"
+            : variant === "anti"
+              ? "Add to the reading"
+              : "Comment"
+        }
+        placeholder={
+          replyTo
+            ? "Continue this thread"
+            : variant === "anti"
+              ? "Add to the reading"
+              : "Write a comment"
+        }
       />
       {error && <p className="form-error">{error}</p>}
     </form>
-    ) : null;
+  );
 
   return (
-    <section id="talk" className="talk-section">
-      <h2>Talk</h2>
+    <section
+      id="talk"
+      className={`talk-section${variant === "anti" ? " is-anti" : ""}`}
+    >
+      <h2>{title}</h2>
+      {lead ? <p className="talk-lead">{lead}</p> : null}
 
       <div id="thread" className="talk-thread">
         {comments.length === 0 && <p className="quiet">No comments yet</p>}

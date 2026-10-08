@@ -14,9 +14,13 @@ export function questionBySlug(slug: string) {
   return QUESTIONS.find((item) => item.slug === slug);
 }
 
-export function questionPath(slug: string) {
-  return `/wiki/q/${slug}`;
+export const WIKI_PATH = "/research";
+
+export function questionPath(_slug?: string) {
+  return WIKI_PATH;
 }
+
+export const CONTINUATION_PATH = WIKI_PATH;
 
 export function questionsForFeature(featureId: number) {
   return QUESTIONS.filter((item) =>

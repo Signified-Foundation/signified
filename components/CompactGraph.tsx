@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { GraphSchematic } from "@/components/GraphSchematic";
 import type { GraphPayload } from "@/lib/types";
 
@@ -39,9 +38,7 @@ export function CompactGraph({
           />
           {featureId != null && (
             <p className="rs-run-note">
-              <Link href={`/wiki/feature-${featureId}`} className="rs-run-link">
-                Feature {featureId}
-              </Link>
+              Feature {featureId}
               {selected?.label ? ` · ${selected.label.replace(/^F\s*/, "")}` : ""}
             </p>
           )}

@@ -1,8 +1,5 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { CATALOG_RUNS, catalogForRun } from "@/lib/catalog";
-import { FIRST_QUESTION, questionPath } from "@/lib/questions";
-import { featureSlug } from "@/lib/wiki";
 
 export type TocItem = {
   href: string;
@@ -13,7 +10,6 @@ export type TocItem = {
 export function WikiFrame({
   current,
   toc,
-  activeHref,
   ground = "paper",
   children,
 }: {
@@ -31,28 +27,16 @@ export function WikiFrame({
         </Link>
         <nav className="mast-nav" aria-label="Wiki">
           <Link
-            href={questionPath(FIRST_QUESTION.slug)}
-            aria-current={current === "question" ? "page" : undefined}
+            href="/research"
+            aria-current={current === "research" ? "page" : undefined}
           >
-            Question
-          </Link>
-          <Link
-            href="/articles"
-            aria-current={current === "index" ? "page" : undefined}
-          >
-            Features
+            Wiki
           </Link>
           <Link
             href="/wiki/method"
             aria-current={current === "method" ? "page" : undefined}
           >
             Method
-          </Link>
-          <Link
-            href="/research"
-            aria-current={current === "research" ? "page" : undefined}
-          >
-            Research
           </Link>
           <Link
             href="/profiles"
@@ -95,39 +79,6 @@ export function WikiFrame({
               </ul>
             </>
           )}
-          {CATALOG_RUNS.map((run) => (
-            <div key={run.id}>
-              <p className="toc-label">
-                {run.modelName} · {run.kicker}
-              </p>
-              <ul>
-                {catalogForRun(run.id).map((item) => {
-                  const href = `/wiki/${featureSlug(item.id)}`;
-                  return (
-                    <li key={item.id}>
-                      <Link
-                        href={href}
-                        aria-current={activeHref === href ? "page" : undefined}
-                      >
-                        {item.label}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-          <p className="toc-label">Features</p>
-          <ul>
-            <li>
-              <Link
-                href="/wiki/method"
-                aria-current={current === "method" ? "page" : undefined}
-              >
-                Method
-              </Link>
-            </li>
-          </ul>
         </nav>
       </div>
     </div>

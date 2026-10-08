@@ -184,17 +184,14 @@ export function QuestionReview({ question }: { question: Question }) {
             <aside className="rs-hatnote" aria-label="Disambiguation">
               This answer is {writerLabel(selected.model_id)} on this question.{" "}
               {sameSea ? (
-                <>For the continuation that also wrote “Black Sea,” see </>
+                <>The continuation that also wrote “Black Sea” is </>
               ) : (
-                <>
-                  For the continuation where Georgia was read as country versus
-                  name-token, see{" "}
-                </>
+                <>The continuation on Georgia as country and as name is </>
               )}
               <Link href={featureHref(HATNOTE_FEATURE_ID)}>
                 {hatnote?.label ?? `Feature ${HATNOTE_FEATURE_ID}`}
               </Link>
-              . That trial is not this one.
+              .
             </aside>
           )}
 

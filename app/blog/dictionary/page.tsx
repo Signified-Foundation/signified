@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BlogNav } from "@/components/BlogNav";
-import { FIRST_QUESTION, questionPath } from "@/lib/questions";
 
 export const metadata: Metadata = {
   title: "Dictionary · Signified",
@@ -15,7 +14,7 @@ const LAYERS = [
     name: "Feature",
     lead: "An internal unit on a run. The article’s subject.",
     body: [
-      "A feature has an id, a layer, an activation, an attribution. It is not a word the model wrote, and it is not the lemma’s true name. The lemma — Georgia, wrath — is a short human handle for debate. The concept is what people are arguing the feature signifies: country, name-token, μῆνις. The feature is observed. The concept is proposed. They are not the same object.",
+      "A feature has an id, a layer, an activation, an attribution. It is not a word the model wrote, and it is not the lemma’s true name. The lemma — Georgia, wrath — is a short human handle for debate. The concept is what people are arguing the feature signifies: country, name-token, heroic anger. The feature is observed. The concept is proposed. They are not the same object.",
     ],
     not: "Not a completion. Not a proof of what the unit is. Not a vote on which model is better.",
     example:
@@ -164,13 +163,13 @@ export default function DictionaryPage() {
         </section>
 
         <p>
-          <Link href={questionPath(FIRST_QUESTION.slug)} className="blog-cta">
-            Review an answer →
+          <Link href="/research" className="blog-cta">
+            Open the wiki →
           </Link>
         </p>
         <p>
-          <Link href="/wiki/feature-2104" className="blog-cta">
-            Choose a response on the Iliad line →
+          <Link href="/research" className="blog-cta">
+            Question and continuation on one desk →
           </Link>
         </p>
       </div>

@@ -1058,6 +1058,15 @@ button.text-link {
   max-width: 16.5rem;
 }
 
+.graph-wrap.is-compact {
+  max-width: none;
+}
+
+.graph-wrap.is-compact .graph-key {
+  margin-bottom: 0.4rem;
+  font-size: 10px;
+}
+
 .graph-stage .graph-wrap {
   max-width: none;
 }
@@ -1281,7 +1290,7 @@ button.text-link {
 
 .btn-solid {
   background: var(--ink);
-  color: var(--types);
+  color: #fff;
   padding: 8px 14px;
   font-size: 13px;
   transition:
@@ -1307,6 +1316,12 @@ button.text-link {
 
 .btn-field:active {
   transform: scale(0.97);
+}
+
+a.btn-solid,
+a.btn-field {
+  display: inline-block;
+  text-decoration: none;
 }
 
 .compose {
@@ -1361,6 +1376,37 @@ button.text-link {
   gap: 0.65em;
   font-size: 1.15rem;
   margin: 1.6rem 0 0.25rem;
+}
+
+.talk-lead {
+  margin: 0.35rem 0 0.85rem;
+  max-width: 42rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 1.45;
+  color: var(--second);
+}
+
+.talk-section.is-anti h2 {
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+.talk-section.is-anti .thread-body,
+.talk-section.is-anti .thread.is-nested .thread-body {
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.talk-section.is-anti .comment-form textarea {
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 .talk-section h2 .section-note {
@@ -1531,13 +1577,20 @@ button.text-link {
   gap: 12px;
 }
 
-.comment-form textarea {
+.comment-form textarea,
+.comment-form input {
   width: 100%;
   border: 1px solid var(--rule);
   background: #fff;
-  padding: 6px 8px;
+  padding: 5px 8px;
   color: var(--ink);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.comment-form textarea {
   resize: vertical;
+  min-height: 2.6rem;
 }
 
 .talk-section .btn-solid {
@@ -1599,7 +1652,7 @@ button.text-link {
 
   .btn-solid:hover {
     background: #2a3036;
-    color: var(--types);
+    color: #fff;
   }
 
   .btn-field:hover {
@@ -2039,13 +2092,68 @@ button.text-link {
 .folio-mast {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 12px 20px;
+}
+
+.folio-mast:has(.profile-composer) {
   flex-wrap: wrap;
-  gap: 16px 24px;
+}
+
+.folio-mast .wordmark {
+  flex: 0 0 auto;
+}
+
+.folio-mast .mast-nav {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 16px 20px;
 }
 
 .mast-actors {
   margin-left: auto;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.mast-who.is-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem 0.55rem;
+  padding: 0.18rem 0.45rem 0.18rem 0.2rem;
+  border: 1px solid var(--rule);
+  background: #fff;
+}
+
+.mast-who.is-chip p {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  margin: 0;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.mast-who.is-chip .avatar.is-s {
+  width: 1.4rem;
+  height: 1.4rem;
+  font-size: 0.7rem;
+}
+
+.mast-leave {
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--mute);
+  transition:
+    color 160ms var(--ease-out),
+    transform 140ms var(--ease-out);
+}
+
+.mast-leave:active {
+  transform: scale(0.97);
 }
 
 .folio-head {
@@ -2384,6 +2492,10 @@ button.text-link {
 .mast-who strong {
   color: var(--ink);
   font-weight: 600;
+}
+
+.mast-who.is-chip p {
+  display: flex;
 }
 
 .mast-actors .form-error {
@@ -3194,9 +3306,9 @@ button.text-link {
 }
 
 .avatar.is-s {
-  width: 1.35rem;
-  height: 1.35rem;
-  font-size: 0.72rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  font-size: 0.58rem;
 }
 
 .avatar.is-m {
@@ -3403,6 +3515,15 @@ button.text-link {
     padding: 18px 16px 48px;
   }
 
+  .folio-mast {
+    flex-wrap: wrap;
+  }
+
+  .folio-mast .mast-nav {
+    flex-basis: 100%;
+    order: 3;
+  }
+
   .folio-stage,
   .issue-stage {
     grid-template-columns: 1fr;
@@ -3492,14 +3613,33 @@ button.text-link {
   gap: 0.4rem;
   padding: 0.8rem 0.9rem 0.9rem;
   border: 1px solid var(--rule);
+  background: #fff;
+  opacity: 0.7;
   cursor: pointer;
   transition:
     border-color 160ms var(--ease-out),
+    background 160ms var(--ease-out),
+    color 160ms var(--ease-out),
+    opacity 160ms var(--ease-out),
     transform 140ms var(--ease-out);
 }
 
+.q-pick.is-alt {
+  border-color: var(--rule);
+  background: #fff;
+}
+
+.folio.is-field .q-pick {
+  background: color-mix(in srgb, #fff 58%, var(--types));
+  border-color: var(--ink);
+}
+
+.folio.is-field .q-pick.is-alt {
+  background: color-mix(in srgb, #fff 82%, var(--types));
+}
+
 .q-pick:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 .q-pick input {
@@ -3512,6 +3652,16 @@ button.text-link {
 
 .q-pick.is-selected {
   border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+  opacity: 1;
+}
+
+.q-pick.is-alt.is-selected {
+  border-color: var(--ink);
+  background: var(--types);
+  color: var(--ink);
+  opacity: 1;
 }
 
 .q-pick:focus-within {
@@ -3527,6 +3677,14 @@ button.text-link {
   color: var(--mute);
 }
 
+.q-pick.is-selected .q-pick-writer {
+  color: color-mix(in srgb, #fff 78%, transparent);
+}
+
+.q-pick.is-alt.is-selected .q-pick-writer {
+  color: var(--ink);
+}
+
 .q-pick-output {
   font-family: var(--font-serif), "Newsreader", Georgia, serif;
   font-size: 1.15rem;
@@ -3538,6 +3696,14 @@ button.text-link {
 .q-pick-meta {
   font-size: 12px;
   color: var(--mute);
+}
+
+.q-pick.is-selected .q-pick-meta {
+  color: color-mix(in srgb, #fff 70%, transparent);
+}
+
+.q-pick.is-alt.is-selected .q-pick-meta {
+  color: var(--ink);
 }
 
 .q-review {
@@ -3554,15 +3720,32 @@ button.text-link {
 
 .q-form {
   margin-top: 0;
+  gap: 0.65rem;
+  max-width: none;
+}
+
+.q-form-band {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem 0.65rem;
+  align-items: end;
+}
+
+.q-form-band .q-form-name {
+  grid-column: 1 / -1;
+}
+
+.q-form-band .btn-solid {
+  align-self: end;
 }
 
 .q-stances {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
-  gap: 0.65rem 1.1rem;
+  gap: 0;
   margin: 0;
   padding: 0;
-  border: 0;
+  border: 1px solid var(--ink);
 }
 
 .q-stances legend {
@@ -3575,14 +3758,38 @@ button.text-link {
 .q-stances label {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 14px;
+  gap: 0.35rem;
+  padding: 0.32rem 0.7rem;
+  font-size: 13px;
   color: var(--ink);
+  background: #fff;
+  cursor: pointer;
+  transition:
+    background 160ms var(--ease-out),
+    color 160ms var(--ease-out);
+}
+
+.q-stances label.is-on {
+  background: var(--ink);
+  color: #fff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .q-stances label:hover {
+    color: var(--ink);
+  }
+
+  .q-stances label.is-on:hover {
+    color: #fff;
+  }
 }
 
 .q-stances input {
-  width: auto;
-  accent-color: var(--ink);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
 }
 
 .q-reviews {
@@ -3654,8 +3861,8 @@ button.text-link {
   max-width: 38rem;
 }
 
-.folio-head .q-cite {
-  margin-top: 1.15rem;
+.folio-head .rs-hatnote {
+  margin-top: 1rem;
 }
 
 .q-cite p {
@@ -3688,6 +3895,7 @@ button.text-link {
 @media (hover: hover) and (pointer: fine) {
   .q-pick:hover {
     border-color: var(--ink);
+    opacity: 1;
   }
 
   .q-index a:hover,
@@ -3695,20 +3903,32 @@ button.text-link {
   .q-cite .text-link:hover {
     color: var(--ink);
   }
+
+  .mast-leave:hover {
+    color: var(--ink);
+  }
 }
 
 .rs-stage {
-  max-width: 42rem;
+  max-width: 46rem;
   margin-inline: auto;
   padding-top: 1.8rem;
 }
 
 .rs-head {
-  margin-bottom: 1.35rem;
+  margin-bottom: 1.15rem;
+}
+
+.rs-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+  flex-wrap: wrap;
 }
 
 .rs-title {
-  margin: 0.35rem 0 0.7rem;
+  margin: 0.5rem 0 0;
   font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
   font-size: clamp(1.7rem, 4vw, 2.45rem);
   font-weight: 400;
@@ -3728,33 +3948,64 @@ button.text-link {
 }
 
 .rs-trials {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 1.35rem;
-  margin: 0 0 1.55rem;
-  padding-bottom: 0.7rem;
-  border-bottom: 1px solid var(--rule);
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--ink);
+  background: #fff;
 }
 
-.rs-trials button {
-  padding: 0.15rem 0 0.35rem;
+.rs-trials button,
+.rs-trials a {
+  position: relative;
+  z-index: 1;
+  padding: 0.34rem 0.8rem;
   font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 0.04em;
-  color: var(--mute);
-  box-shadow: inset 0 -1px 0 transparent;
-  transition:
-    color 160ms var(--ease-out),
-    box-shadow 160ms var(--ease-out);
-}
-
-.rs-trials button.is-current {
+  background: transparent;
   color: var(--ink);
-  box-shadow: inset 0 -1px 0 var(--ink);
+  text-decoration: none;
+  transition: transform 140ms var(--ease-out);
 }
 
-.rs-trials button:active {
-  transform: scale(0.98);
+.rs-trials button.is-current,
+.rs-trials a.is-current {
+  background: transparent;
+  color: var(--ink);
+}
+
+.rs-trials-on {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--ink);
+  color: #fff;
+  pointer-events: none;
+  clip-path: inset(0 50% 0 0);
+  transition: clip-path 180ms var(--ease-out);
+}
+
+.rs-trials[data-current="lead"] .rs-trials-on {
+  clip-path: inset(0 0 0 50%);
+}
+
+.rs-trials-on span {
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.rs-trials button:active,
+.rs-trials a:active {
+  transform: scale(0.97);
 }
 
 .rs-prompt {
@@ -3778,7 +4029,9 @@ button.text-link {
   color: var(--second);
 }
 
-.rs-hatnote a {
+.rs-hatnote a,
+.rs-hatnote .rs-inline {
+  font: inherit;
   font-style: italic;
   color: var(--ink);
   text-decoration: none;
@@ -3813,12 +4066,8 @@ button.text-link {
   border-top: 1px solid var(--rule);
 }
 
-.rs-review-who,
 .rs-review-go {
-  margin: 0.35rem 0 0.85rem;
-  max-width: 36rem;
-  font-size: 14px;
-  color: var(--mute);
+  margin: 0.7rem 0 0;
 }
 
 .rs-reviews ol {
@@ -3906,8 +4155,11 @@ button.text-link {
   gap: 0.35rem;
 }
 
-.rs-also a {
+.rs-also a,
+.rs-also button {
+  font: inherit;
   font-size: 15px;
+  text-align: left;
   text-decoration: none;
   box-shadow: inset 0 -1px 0 currentColor;
 }
@@ -3919,13 +4171,574 @@ button.text-link {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .rs-trials button:hover {
+  .rs-hatnote a:hover,
+  .rs-hatnote .rs-inline:hover,
+  .rs-run-link:hover,
+  .rs-also a:hover,
+  .rs-also button:hover {
     color: var(--ink);
   }
 
-  .rs-hatnote a:hover,
-  .rs-run-link:hover,
-  .rs-also a:hover {
+  .rs-tile:hover,
+  .rs-path-end:hover {
+    border-color: var(--ink);
     color: var(--ink);
+  }
+}
+
+.rs-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-right: 0.85rem;
+  font-size: 12px;
+  color: var(--mute);
+}
+
+.rs-swatch::before {
+  content: "";
+  width: 0.7rem;
+  height: 0.7rem;
+  background: color-mix(in srgb, var(--types) 70%, #fff);
+}
+
+.rs-swatch.is-b::before {
+  background: color-mix(in srgb, var(--second) 55%, #fff);
+}
+
+.rs-den {
+  margin: 1.8rem 0 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--ink);
+}
+
+.rs-den-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.35rem;
+}
+
+.rs-den-axis {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.rs-den-a {
+  fill: var(--types);
+}
+
+.rs-den-b {
+  fill: var(--second);
+}
+
+.rs-den-mark path {
+  fill: var(--ink);
+}
+
+.rs-den-mark.is-other path {
+  fill: var(--second);
+}
+
+.rs-den-mark.is-on path {
+  fill: var(--ink);
+}
+
+.rs-den-stem {
+  stroke: var(--ink);
+  stroke-width: 1.75;
+}
+
+.rs-den-mark.is-pick {
+  cursor: pointer;
+}
+
+.rs-den-mark text,
+.rs-den-x {
+  fill: var(--mute);
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.rs-den-mark.is-on text {
+  fill: var(--ink);
+}
+
+.rs-den figcaption,
+.rs-map-legend,
+.rs-map-note {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  color: var(--second);
+}
+
+.rs-map {
+  margin: 1.8rem 0 0;
+}
+
+.rs-path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
+  list-style: none;
+  margin: 0.45rem 0 0;
+  padding: 0;
+}
+
+.rs-path-end {
+  max-width: 16rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.02rem;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  text-decoration: none;
+  color: inherit;
+}
+
+.rs-path-end.is-out {
+  color: var(--ink);
+}
+
+.rs-path-end.is-a {
+  color: var(--supported);
+}
+
+.rs-path-end.is-b {
+  color: var(--second);
+}
+
+.rs-path-arrow,
+.rs-path-gap {
+  color: var(--mute);
+  font-size: 13px;
+}
+
+.rs-tile-sheet {
+  display: grid;
+  gap: 1.05rem;
+  margin-top: 0.7rem;
+}
+
+.rs-tile-run-name {
+  margin: 0 0 0.35rem;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.rs-tile-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.rs-tile {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 6.4rem;
+  padding: 0.5rem 0.65rem 0.55rem;
+  font: inherit;
+  border: 1px solid color-mix(in srgb, var(--types) 55%, var(--rule));
+  background: color-mix(in srgb, var(--types) 22%, #fff);
+  text-align: left;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    border-color 160ms var(--ease-out),
+    background 160ms var(--ease-out),
+    transform 140ms var(--ease-out);
+}
+
+.rs-tile.is-nav {
+  border-color: var(--ink);
+  background: #fff;
+}
+
+.rs-tile.is-other {
+  border-color: color-mix(in srgb, var(--second) 40%, var(--rule));
+  background: color-mix(in srgb, var(--second) 12%, #fff);
+}
+
+.rs-tile.is-selected {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.rs-tile:active {
+  transform: scale(0.97);
+}
+
+.rs-tile span {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.rs-tile em {
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.rs-evpath {
+  margin-top: 1.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+}
+
+.rs-desk {
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) 17.5rem;
+  grid-template-areas: "page rail";
+}
+
+.rs-desk .rs-page {
+  grid-area: page;
+  min-width: 0;
+}
+
+.rs-rail {
+  grid-area: rail;
+  position: sticky;
+  top: 1.15rem;
+  display: grid;
+  gap: 0.85rem;
+  width: 17.5rem;
+  align-self: start;
+}
+
+.rs-instrument {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.7rem 0.75rem 0.8rem;
+  border: 1px solid var(--ink);
+  background: #fff;
+}
+
+.rs-pin {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.45rem;
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.rs-pin em {
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-size: 1.05rem;
+  font-style: normal;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.rs-pin span {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.rs-pin,
+.rs-pin-title {
+  animation: rs-pin-in 180ms var(--ease-out);
+}
+
+@keyframes rs-pin-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rs-block {
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--ink);
+  background: transparent;
+}
+
+.rs-instrument .rs-den,
+.rs-instrument .rs-map,
+.rs-block .rs-den,
+.rs-block .rs-map {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.rs-map.is-compact .kicker {
+  margin-bottom: 0.1rem;
+  font-size: 10px;
+}
+
+.rs-map.is-compact .rs-path.is-line {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 0.28rem;
+  margin: 0.08rem 0 0;
+  min-width: 0;
+}
+
+.rs-map.is-compact .rs-path.is-line .rs-path-end {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rs-map.is-compact .rs-tile-sheet {
+  gap: 0;
+  margin-top: 0.32rem;
+}
+
+.rs-map.is-compact .rs-tile-row {
+  gap: 0.14rem;
+}
+
+.rs-map.is-compact .rs-tile {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0.08rem 0.28rem;
+}
+
+.rs-map.is-compact .rs-tile span {
+  display: none;
+}
+
+.rs-map.is-compact .rs-tile em {
+  font-size: 0.64rem;
+  font-style: normal;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.rs-map.is-compact .rs-tile.is-nav {
+  background: #fff;
+  border-color: var(--ink);
+}
+
+.rs-map.is-compact .rs-tile.is-nav.is-selected {
+  background: var(--ink);
+}
+
+.rs-map.is-compact .rs-tile.is-nav.is-selected em {
+  color: #fff;
+}
+
+.rs-map.is-compact .rs-path-end {
+  max-width: 7.2rem;
+  font-size: 0.68rem;
+}
+
+.rs-map.is-compact .rs-path-gap,
+.rs-map.is-compact .rs-path-arrow {
+  flex: none;
+  font-size: 10px;
+}
+
+.rs-map.is-compact .rs-map-note {
+  display: none;
+}
+
+.float-card.is-map {
+  padding: 0.7rem 0.8rem 0.8rem;
+}
+
+.float-card.is-map .rs-map {
+  margin: 0;
+}
+
+.rs-room.is-specimen,
+.rs-dossier {
+  margin: 1.6rem 0 0;
+  padding-top: 1.35rem;
+  border-top: 1px solid var(--ink);
+}
+
+.rs-room.is-talk {
+  margin: 1.4rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+}
+
+.rs-specimen-head .kicker {
+  margin-bottom: 0.15rem;
+}
+
+.rs-pin-title {
+  margin: 0;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-size: clamp(1.7rem, 4vw, 2.45rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+}
+
+.rs-pin-title span {
+  display: inline-block;
+  margin-left: 0.45rem;
+  font-family: var(--font-body), "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.38em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mute);
+  vertical-align: 0.28em;
+}
+
+.rs-dossier h2 {
+  margin: 0;
+  font-family: var(--font-display), "Montaga", ui-serif, Georgia, serif;
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+.rs-dossier .rs-dek {
+  margin-top: 0.45rem;
+}
+
+.rs-dossier .claim-read {
+  margin: 1.15rem 0 0;
+}
+
+.rs-dossier .reading-pair,
+.rs-dossier .issue-pair:not(.is-single) {
+  gap: 0;
+}
+
+.rs-dossier .reading-pair .reading,
+.rs-dossier .issue-pair blockquote {
+  padding: 0.2rem 1.15rem 0.25rem 0;
+}
+
+.rs-dossier .reading-pair .reading + .reading,
+.rs-dossier .issue-pair blockquote + blockquote {
+  padding-left: 1.15rem;
+  padding-right: 0;
+  border-left: 1px solid var(--rule);
+}
+
+.rs-dossier .reading-who,
+.rs-dossier .issue-pair cite {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.rs-dossier #evidence {
+  margin: 1.35rem 0 0;
+  padding-top: 1.05rem;
+  border-top: 1px solid var(--rule);
+}
+
+.rs-dossier #evidence h2 {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-body), "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.rs-page .thread-body,
+.rs-page .thread.is-nested .thread-body,
+.rs-dossier .issue-pair p,
+.rs-dossier .reading p {
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.rs-desk .form-error {
+  color: var(--ink);
+}
+
+.rs-page .talk-section,
+.rs-room.is-talk .talk-section {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.rs-room.is-talk .rs-also {
+  margin-top: 1.4rem;
+}
+
+@media (max-width: 960px) {
+  .folio-stage.rs-desk {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+    grid-template-areas: none;
+  }
+
+  .rs-rail {
+    position: static;
+    width: 100%;
+    order: -1;
+  }
+
+  .rs-instrument .rs-den-svg {
+    display: none;
+  }
+
+  .rs-dossier .issue-pair blockquote + blockquote {
+    padding-left: 0;
+    border-left: 0;
+    padding-top: 0.85rem;
+    margin-top: 0.55rem;
+    border-top: 1px solid var(--rule);
+  }
+}
+
+@media (max-width: 719px) {
+  .rs-dossier .reading-pair .reading + .reading {
+    padding-left: 0;
+    border-left: 0;
+    padding-top: 0.85rem;
+    margin-top: 0.55rem;
+    border-top: 1px solid var(--rule);
+  }
+}
+
+@media (max-width: 720px) {
+  .q-form-band {
+    grid-template-columns: 1fr;
+  }
+
+  .q-form-band .btn-solid {
+    justify-self: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rs-tile:active,
+  .q-pick:active,
+  .rs-trials button:active,
+  .mast-leave:active {
+    transform: none;
+  }
+
+  .rs-pin,
+  .rs-pin-title,
+  .rs-trials-on {
+    animation: none;
+    transition: none;
   }
 }

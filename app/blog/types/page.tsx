@@ -185,8 +185,8 @@ export default function TypesPage() {
         </section>
 
         <p>
-          <Link href="/wiki/feature-3102" className="blog-cta">
-            See the types held in one article →
+          <Link href="/research" className="blog-cta">
+            See the types held on the desk →
           </Link>
         </p>
       </div>

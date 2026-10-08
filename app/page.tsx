@@ -8,15 +8,13 @@ import {
   type CatalogFeature,
 } from "@/lib/catalog";
 import { MODELS, SCORES } from "@/lib/models";
-import { FIRST_QUESTION, questionPath } from "@/lib/questions";
-import { featureSlug } from "@/lib/wiki";
 
 function Entry({ item }: { item: CatalogFeature }) {
   const state = articleState(item);
   return (
     <li>
       <Link
-        href={`/wiki/${featureSlug(item.id)}`}
+        href="/research"
         className={`is-${state}`}
       >
         {item.label}
@@ -41,8 +39,8 @@ function Spine({ item }: { item: CatalogFeature }) {
         <h2 className="front-a">{item.left.text}</h2>
         {item.right && <p className="front-b">{item.right.text}</p>}
         <p className="front-hold">{item.hold}</p>
-        <Link href={`/wiki/${featureSlug(item.id)}`} className="front-go">
-          Open the feature
+        <Link href="/research" className="front-go">
+          Open in the wiki
         </Link>
       </div>
     </article>
@@ -62,31 +60,26 @@ export default function Home() {
           Signified
         </Link>
         <nav className="front-nav" aria-label="Wiki">
-          <Link href={questionPath(FIRST_QUESTION.slug)}>Question</Link>
-          <Link href="/articles">Features</Link>
+          <Link href="/research">Wiki</Link>
           <Link href="/wiki/method">Method</Link>
-          <Link href="/research">Research</Link>
           <Link href="/profiles">Profiles</Link>
           <Link href="/blog/types">Types</Link>
           <Link href="/blog/dictionary">Dictionary</Link>
         </nav>
       </header>
 
-      
-
       <section className="front-hero">
         <div className="front-stage">
           <h1 className="front-title">Signified</h1>
           <p className="front-subtitle">
-            Questions: what models do. Features: what they might represent.
+            A wiki for understanding how AI models behave.
           </p>
           <p className="front-why">
-            Review an answer to see behavior — a question, writers, completions.
-            Open a feature to investigate one latent unit on a run. Humans
-            argue over what that unit means. The model does not name it.
+            Explore model responses, look at the evidence, and compare
+            explanations of what might be happening inside.
           </p>
           <p className="front-acts">
-            Discover{" "}
+            Explore{" "}
             <span className="front-chip">
               <img
                 src="/gallery-wall.jpg"
@@ -94,7 +87,7 @@ export default function Home() {
                 className="is-observe"
               />
             </span>{" "}
-            investigate{" "}
+            compare{" "}
             <span className="front-chip">
               <img
                 src="/gallery-wall.jpg"
@@ -102,7 +95,7 @@ export default function Home() {
                 className="is-interpret"
               />
             </span>{" "}
-            interpret{" "}
+            discuss{" "}
             <span className="front-chip">
               <img
                 src="/gallery-wall.jpg"
@@ -112,11 +105,8 @@ export default function Home() {
             </span>
           </p>
           <p className="front-doors">
-            <Link href={questionPath(FIRST_QUESTION.slug)} className="front-go">
-              Review an answer
-            </Link>
-            <Link href="/articles" className="front-go is-quiet">
-              Explore features
+            <Link href="/research" className="front-go">
+              Explore the wiki
             </Link>
           </p>
         </div>
@@ -140,8 +130,8 @@ export default function Home() {
               </p>
             ))}
           </div>
-          <Link href="/articles" className="front-go">
-            Explore features
+          <Link href="/research" className="front-go">
+            Open the wiki
           </Link>
         </footer>
 
@@ -213,102 +203,54 @@ export default function Home() {
 
       <section className="front-does" aria-labelledby="explore-title">
         <section className="does-chapter" aria-labelledby="explore-title">
-          <h2 id="explore-title">Explore what models prefer</h2>
+          <h2 id="explore-title">What you can do here</h2>
           <p>
-            Models can be measured from the inside. Features can be identified.
-            Behaviors can be tested. Preferences can be compared across models.
-          </p>
-          <p>
-            Signified turns those observations into a shared, searchable body of
-            knowledge. Each entry brings together the model behavior, the
-            evidence behind it, and the views people have formed around it.
+            Each wiki entry brings together an example of model behavior,
+            the available evidence, and people’s explanations.
           </p>
           <ul className="does-list">
             <li>
-              <strong>Discover</strong>
+              <strong>Explore</strong>
               <span>
-                Preferences, tendencies, representations, and behaviors —
-                collected as entries.
-              </span>
-            </li>
-            <li>
-              <strong>Investigate</strong>
-              <span>
-                Measure from the inside. Identify features. Test behaviors.
+                Read prompts and see how different models respond.
               </span>
             </li>
             <li>
               <strong>Compare</strong>
               <span>
-                Scorers can look at the same written pair. That is not a
-                measurement of the feature.
+                Look at measurements and the explanations they support.
               </span>
             </li>
             <li>
-              <strong>Evidence</strong>
+              <strong>Discuss</strong>
               <span>
-                The measurable behavior, and the test behind it, on the same
-                page as the view.
-              </span>
-            </li>
-            <li>
-              <strong>Interpret</strong>
-              <span>The views people have formed around an entry.</span>
-            </li>
-            <li>
-              <strong>Challenge</strong>
-              <span>
-                Discuss and contest. Some views converge. Others stay open.
-                That disagreement is part of the knowledge.
+                Add an explanation, ask a question, or challenge a claim.
               </span>
             </li>
           </ul>
         </section>
 
         <section className="does-chapter" aria-labelledby="evidence-title">
-          <h2 id="evidence-title">Where evidence meets interpretation</h2>
+          <h2 id="evidence-title">What do the results mean?</h2>
           <p>
-            A model can consistently prefer one answer over another. What that
-            preference means is another question.
-          </p>
-          <p>
-            Signified makes room for both: the measurable behavior and the human
-            interpretation. People can discuss and challenge the views attached
-            to a model. Some will converge. Others will remain contested. That
-            disagreement is part of the knowledge.
+            Measurements show what happened in a test. People propose
+            explanations for why. Signified keeps both together so you can
+            judge the evidence and see where people disagree.
           </p>
         </section>
 
-        <section className="does-chapter" aria-labelledby="vocab-title">
-          <h2 id="vocab-title">Building the vocabulary of AI</h2>
-          <p>
-            As models become more capable, we need better ways to describe what
-            they do—and what we think is happening inside them. Signified is
-            building that vocabulary in public.
-          </p>
-          <p>
-            A living map of model preferences, features, behaviors, and
-            interpretations.
-          </p>
-        </section>
-
-        <p className="front-signal">
-          The model produces the signal.
-          <br />
-          Signified captures what it comes to mean.
-        </p>
         <p className="does-more">
           <Link href="/wiki/method" className="text-link">
-            How a reading is held
+            How the wiki works
           </Link>
           <Link href="/blog/types" className="text-link">
-            The five kinds of object
+            What an entry contains
           </Link>
           <Link href="/blog/dictionary" className="text-link">
-            The two votes
+            How voting works
           </Link>
           <Link href="/blog/interventions" className="text-link">
-            After the completion
+            Testing model behavior
           </Link>
         </p>
       </section>

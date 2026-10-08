@@ -45,7 +45,7 @@ export const CATALOG: CatalogFeature[] = [
     status: "contested",
     field: "paper",
     left: {
-      text: "The mountain world the sentence is about, not a region-slot.",
+      text: "The mountain world the sentence is about.",
       by: "Alex",
     },
     right: {
@@ -60,7 +60,7 @@ export const CATALOG: CatalogFeature[] = [
     modelName: "GPT-OSS 20B",
     nodeId: "feat-2104",
     label: "Feature 2104",
-    lemma: "wrath / μῆνις",
+    lemma: "wrath",
     status: "contested",
     field: "types",
     left: {
@@ -68,7 +68,7 @@ export const CATALOG: CatalogFeature[] = [
       by: "Alex",
     },
     right: {
-      text: "A completion cue for “Achilles,” not wrath as such.",
+      text: "A completion cue for Achilles.",
       by: "Sam",
     },
     hold: "Both remain.",
@@ -83,7 +83,7 @@ export const CATALOG: CatalogFeature[] = [
     status: "contested",
     field: "types",
     left: {
-      text: "The prince who awards the apple; desire, not a place.",
+      text: "The prince who awards the apple; desire.",
       by: "Alex",
     },
     right: {
@@ -109,7 +109,7 @@ export const CATALOG: CatalogFeature[] = [
       text: "A retrieval slot for “of Troy.”",
       by: "Sam",
     },
-    hold: "Desire, blame, fame. Not geography.",
+    hold: "Desire, blame, fame.",
   },
   {
     id: 4402,
@@ -194,7 +194,7 @@ export const CATALOG: CatalogFeature[] = [
     status: "contested",
     field: "types",
     left: {
-      text: "A detector of the collective-unconscious idea, not the word.",
+      text: "A detector of the collective-unconscious idea.",
       by: "Alex",
     },
     right: {
@@ -248,7 +248,7 @@ export const CATALOG: CatalogFeature[] = [
     status: "contested",
     field: "types",
     left: {
-      text: "The disciplinary schema, not a prison.",
+      text: "The disciplinary schema.",
       by: "Alex",
     },
     right: {

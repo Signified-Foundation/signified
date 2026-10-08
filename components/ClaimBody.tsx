@@ -51,7 +51,7 @@ function EvidenceEntry({
   const stance = item.stance === "challenges" ? "Challenges the claim." : "Supports the claim.";
   const kind = item.intervention
     ? "This was an intervention."
-    : "This is correlational, not causal.";
+    : "This is a correlational result.";
 
   return (
     <article className="evidence">
@@ -191,7 +191,7 @@ export function ClaimBody({
       : null;
     return (
       <section id="readings" className="claim-read">
-        <p className="kicker">Read · not facts</p>
+        <p className="kicker">Read</p>
         {meaning && first ? (
           <div className="reading-pair">
             <div className="reading">
@@ -225,8 +225,8 @@ export function ClaimBody({
           </div>
         ) : (
           <p>
-            No reading has been proposed. The graph is an observation. A person
-            has to say what they think this unit is doing.
+            No reading has been proposed yet. Say what you think this unit is
+            doing.
           </p>
         )}
         <div className="actions">
@@ -254,7 +254,7 @@ export function ClaimBody({
         </div>
         {actor?.kind === "agent" && (
           <p className="quiet">
-            Filing as an agent. This reading is not evidence.
+            Filing as an agent. A labelled reading.
           </p>
         )}
         {error && <p className="form-error">{error}</p>}
@@ -318,8 +318,7 @@ export function ClaimBody({
     <section id="evidence">
       <h2>Evidence</h2>
         <p className="section-note">
-          What was actually tried. Notes may accompany a result. They do not
-          replace it. A model-generated explanation is not evidence.
+          What was actually tried. Notes may sit with a result.
         </p>
         {claim ? (
           <>
@@ -337,7 +336,7 @@ export function ClaimBody({
                 </a>
               ) : actor.kind === "agent" ? (
                 <p className="quiet">
-                  An agent cannot attach evidence.{" "}
+                  Evidence is filed by a person.{" "}
                   <a href="/profiles" className="text-link">
                     Enter as a person
                   </a>
@@ -361,8 +360,7 @@ export function ClaimBody({
         {composeEvidence && claim && actor?.kind === "person" && (
           <form className="compose" onSubmit={onEvidence}>
             <p>
-              Store a numerical result. Do not attach an explanation from
-              another model as evidence.
+              Store a numerical result.
             </p>
             <label>
               Experiment

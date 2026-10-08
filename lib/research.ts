@@ -1,7 +1,12 @@
-import { CATALOG, type CatalogFeature } from "@/lib/catalog";
-import { FIRST_QUESTION, questionPath } from "@/lib/questions";
+import {
+  CATALOG,
+  CATALOG_RUNS,
+  type CatalogFeature,
+  type FeatureStatus,
+} from "@/lib/catalog";
+import { CONTINUATION_PATH, FIRST_QUESTION, questionPath } from "@/lib/questions";
 import { SEED } from "@/lib/seed";
-import type { GraphPayload } from "@/lib/types";
+import type { GraphPayload, UserKind } from "@/lib/types";
 import { featureSlug } from "@/lib/wiki";
 
 export const RESEARCH_QUESTION = FIRST_QUESTION;
@@ -91,6 +96,23 @@ export function questionHref() {
   return questionPath(RESEARCH_QUESTION.slug);
 }
 
+export function continuationHref() {
+  return CONTINUATION_PATH;
+}
+
+/** Prompt → units → output for a catalogued run, with a hop back to its page. */
+export function observationPath(runId: number) {
+  const catalog = CATALOG_RUNS.find((row) => row.id === runId);
+  const units = measuredOnRun(runId);
+  return {
+    prompt: catalog?.prompt ?? "",
+    output: catalog?.output ?? "",
+    unitIds: units.map((item) => item.id),
+    traced: units.length > 0,
+    promptHref: runId === CONTINUATION_RUN_ID ? CONTINUATION_PATH : undefined,
+  };
+}
+
 export type ResearchReview = {
   id: number;
   stance: string;
@@ -114,6 +136,55 @@ export type ResearchSeeAlso = {
   href: string;
 };
 
+export type DensityBin = {
+  log10: number;
+  continuation: number;
+  other: number;
+};
+
+export type DensityMark = {
+  id: number;
+  label: string;
+  log10: number;
+  series: "continuation" | "other";
+};
+
+export type DensityFigure = {
+  bins: DensityBin[];
+  marks: DensityMark[];
+};
+
+export type ResearchTile = {
+  id: number;
+  lemma: string;
+  label: string;
+  runId: number;
+  kicker: string;
+  status: FeatureStatus;
+  series: "continuation" | "other";
+  activation: number | null;
+  href: string;
+  hold: string;
+  left: { text: string; by: string };
+  right: { text: string; by: string } | null;
+};
+
+export type ResearchComment = {
+  id: number;
+  author: string;
+  kind: UserKind;
+  text: string;
+  parent_id: number | null;
+  created_at: string;
+};
+
+export type EvidencePath = {
+  left: string;
+  unit: string;
+  right: string;
+  note: string;
+};
+
 export type ResearchPayload = {
   question: { text: string; href: string };
   hatnote: { id: number; label: string; href: string };
@@ -127,7 +198,80 @@ export type ResearchPayload = {
     graph: GraphPayload | null;
   };
   seeAlso: ResearchSeeAlso[];
+  tiles: ResearchTile[];
+  density: DensityFigure;
 };
+
+function gauss(log10: number, mean: number, sigma: number, amp: number) {
+  const z = (log10 - mean) / sigma;
+  return Math.max(0, Math.round(amp * Math.exp(-0.5 * z * z)));
+}
+
+/** Fixture SAE-style histogram. Not circuit-tracer. */
+export function densityFigure(): DensityFigure {
+  const bins: DensityBin[] = [];
+  for (let step = -52; step <= -4; step += 2) {
+    const log10 = step / 10;
+    bins.push({
+      log10,
+      continuation: gauss(log10, -2.45, 0.82, 40) + (log10 < -4.6 ? 18 : 0),
+      other: gauss(log10, -2.15, 0.9, 34) + (log10 < -4.8 ? 12 : 0),
+    });
+  }
+  return {
+    bins,
+    marks: [
+      { id: 3102, label: "3102", log10: -1.8, series: "continuation" },
+      { id: 3108, label: "3108", log10: -2.4, series: "continuation" },
+      { id: 2104, label: "2104", log10: -2.0, series: "other" },
+    ],
+  };
+}
+
+export function researchTiles(): ResearchTile[] {
+  return CATALOG.map((item) => {
+    const feat = SEED.features.find((row) => row.feature_id === item.id);
+    const run = CATALOG_RUNS.find((row) => row.id === item.runId);
+    return {
+      id: item.id,
+      lemma: item.lemma,
+      label: item.label,
+      runId: item.runId,
+      kicker: run?.kicker ?? `Run ${item.runId}`,
+      status: item.status,
+      series: item.runId === CONTINUATION_RUN_ID ? "continuation" : "other",
+      activation: feat?.activation ?? null,
+      href: featureHref(item.id),
+      hold: item.hold,
+      left: item.left,
+      right: item.right,
+    };
+  });
+}
+
+export function commentsForFeature(featureId: number): ResearchComment[] {
+  const row = SEED.features.find((item) => item.feature_id === featureId);
+  if (!row) return [];
+  return SEED.comments
+    .filter((item) => item.feature_pk === row.id)
+    .map((item) => ({
+      id: item.id,
+      author: userName(item.author_id),
+      kind: SEED.users.find((user) => user.id === item.author_id)?.kind ?? "person",
+      text: item.text,
+      parent_id: item.parent_id,
+      created_at: item.created_at,
+    }));
+}
+
+export function contrastPath(tile: ResearchTile): EvidencePath {
+  return {
+    left: `${tile.left.by}'s frame`,
+    unit: tile.label,
+    right: tile.right ? `${tile.right.by}'s frame` : "An unmatched frame",
+    note: "The test to run: two frames on this unit.",
+  };
+}
 
 export function researchPayload(): ResearchPayload {
   const hatnoteItem = catalogFeature(HATNOTE_FEATURE_ID);
@@ -171,6 +315,8 @@ export function researchPayload(): ResearchPayload {
       lemma: item.lemma,
       href: featureHref(item.id),
     })),
+    tiles: researchTiles(),
+    density: densityFigure(),
   };
 }
 

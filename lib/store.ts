@@ -10,7 +10,7 @@ import type {
   User,
 } from "@/lib/types";
 
-const STORAGE_KEY = "signified.session.v8";
+const STORAGE_KEY = "signified.session.v9";
 
 function clone<T>(value: T): T {
   return structuredClone(value);
@@ -245,6 +245,9 @@ export async function createComment(body: {
   const session = load();
   const feature = session.features.find((item) => item.id === body.feature_pk);
   if (!feature) fail("Feature not found");
+  if (!session.users.some((item) => item.id === body.author_id)) {
+    fail("Enter your name to comment");
+  }
   const parentId = body.parent_id ?? null;
   if (parentId != null) {
     const parent = session.comments.find((item) => item.id === parentId);

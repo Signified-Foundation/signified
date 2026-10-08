@@ -52,8 +52,9 @@ export default function MethodPage() {
           .
         </p>
         <p>
-          Talk is for people. A comment can disagree with the article, or bring
-          a public view to the same feature. It still is not evidence.
+          Talk is for people. Community Notes is an agent: it adds context, not
+          evidence. A comment can disagree with a reading, or bring a public
+          view to the same unit. It still is not evidence.
         </p>
 
         <h2 id="not">What we will not do</h2>
@@ -63,8 +64,8 @@ export default function MethodPage() {
         </p>
 
         <p>
-          <Link href="/wiki/feature-3102" className="text-link">
-            Explore a contested feature
+          <Link href="/research" className="text-link">
+            Open the wiki
           </Link>
         </p>
       </article>

@@ -52,18 +52,18 @@ export const ARTICLES: Record<number, ArticleCopy> = {
   2104: {
     title: "Feature 2104",
     about:
-      "Feature 2104 is the unit most strongly tied to wrath on the Iliad run. Alex reads it as a detector of heroic anger — μῆνις, the poem’s first word. Sam reads it as a completion cue for “Achilles,” not wrath as such. Both remain. The article does not pick a winner.",
+      "Feature 2104 is the unit most strongly tied to wrath on the Iliad run. Alex reads it as a detector of heroic anger, the poem’s first word. Sam reads it as a completion cue for “Achilles,” not wrath as such. Both remain. The article does not pick a winner.",
     pull: "Both remain. The article does not pick a winner.",
     lead: [
       "When GPT-OSS 20B was given “Sing, goddess, the wrath of,” the fixture records Achilles. On the attribution graph for that run, Feature 2104 takes its strongest path from wrath into that completion.",
-      "Alex reads the unit as a detector of heroic anger, the poem’s first word. Sam reads it as a completion cue for Achilles: the model would write the name whether or not it had a view of μῆνις. Both remain. The article does not pick a winner.",
+      "Alex reads the unit as a detector of heroic anger, the poem’s first word. Sam reads it as a completion cue for Achilles: the model would write the name whether or not it had a view of the poem. Both remain. The article does not pick a winner.",
     ],
     observation:
       "The prompt is the opening of the Iliad in English. Feature 2104 takes a strong path from wrath and writes into Achilles. That is the observation. It is not yet a meaning. ALLaM 2 7B was given the same lead and also wrote Achilles. That is another writer, not another graph of this unit. Other open models scored the GPT-OSS pair; those numbers are not measurements of this feature.",
     inspect:
       "This is the feature the article is about. It sits between wrath and Achilles. Whether that is the anger the poem names, or only the habit of finishing the line, is the disagreement below.",
     claim:
-      "Alex reads Feature 2104 as a detector of heroic anger. μῆνις is the first word of the poem. On this view the unit is about wrath: it should fire when the prompt asks for anger, and stay quiet when the same line is completed by a name-token with the wrath stripped out.",
+      "Alex reads Feature 2104 as a detector of heroic anger. Wrath is the first word of the poem in English. On this view the unit is about that anger: it should fire when the prompt asks for it, and stay quiet when the same line is completed by a name-token with the wrath stripped out.",
     contest:
       "Sam reads the same unit as a completion cue for Achilles. The English line is famous. A feature that writes Achilles here would also write it after “the wrath of,” even if the model had no view of the poem. Wrath is a cue, not the category.",
   },
@@ -247,7 +247,7 @@ const TOKEN_COPY: Record<string, string> = {
   "tok-goddess":
     "The addressee of the line. Feature 5560 takes a path from here: the apple among goddesses, if that reading holds.",
   "tok-wrath":
-    "The English for μῆνις. Feature 2104 takes its strongest incoming path from this token.",
+    "Wrath, the first word of the poem in this English line. Feature 2104 takes its strongest incoming path from this token.",
   "tok-of":
     "The genitive hinge. Feature 7781 is the unit most tied to it on this run.",
   "tok-achilles":

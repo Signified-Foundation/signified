@@ -3,7 +3,6 @@
 import { useId, useState } from "react";
 import Link from "next/link";
 import { kindPhrase } from "@/lib/profile";
-import { FIRST_QUESTION, questionPath } from "@/lib/questions";
 import type { ProfilePayload, User } from "@/lib/types";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { ProfileComposer } from "@/components/ProfileComposer";
@@ -42,28 +41,16 @@ export function FolioMast({
       </Link>
       <nav className="mast-nav" aria-label="Wiki">
         <Link
-          href={questionPath(FIRST_QUESTION.slug)}
-          aria-current={current === "question" ? "page" : undefined}
+          href="/research"
+          aria-current={current === "research" ? "page" : undefined}
         >
-          Question
-        </Link>
-        <Link
-          href="/articles"
-          aria-current={current === "articles" ? "page" : undefined}
-        >
-          Features
+          Wiki
         </Link>
         <Link
           href="/wiki/method"
           aria-current={current === "method" ? "page" : undefined}
         >
           Method
-        </Link>
-        <Link
-          href="/research"
-          aria-current={current === "research" ? "page" : undefined}
-        >
-          Research
         </Link>
         <Link
           href="/profiles"
@@ -87,10 +74,10 @@ export function FolioMast({
       {showIdentity && (
         <div className="mast-actors" id="login">
           {actor ? (
-            <div className="mast-who">
+            <div className="mast-who is-chip">
               {onSetImage ? (
                 <label className="mast-face" htmlFor={photoId} title="Change photo">
-                  <ProfileAvatar user={actor} size="m" />
+                  <ProfileAvatar user={actor} size="s" />
                   <span className="sr-only">Change photo</span>
                   <input
                     id={photoId}
@@ -103,14 +90,13 @@ export function FolioMast({
                   />
                 </label>
               ) : (
-                <ProfileAvatar user={actor} size="m" />
+                <ProfileAvatar user={actor} size="s" />
               )}
-              <p>
+              <p title={kindPhrase(actor)}>
                 You are <strong>{actor.name}</strong>
-                <span>{kindPhrase(actor)}</span>
               </p>
               {onLeave && (
-                <button type="button" className="comment-reply" onClick={onLeave}>
+                <button type="button" className="mast-leave" onClick={onLeave}>
                   Leave
                 </button>
               )}

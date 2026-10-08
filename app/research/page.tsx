@@ -3,11 +3,11 @@ import { ResearchDemo } from "@/components/ResearchDemo";
 import { researchPayload } from "@/lib/research";
 
 export const metadata: Metadata = {
-  title: "Research · typed links · Signified",
+  title: "Wiki · Signified",
   description:
-    "Same lemma is not the same computation. Hatnote, on this run, and see also are three relations.",
+    "A question and a continuation on one desk. Units, readings, and an anti-debate.",
 };
 
-export default function ResearchPage() {
+export default function WikiPage() {
   return <ResearchDemo data={researchPayload()} />;
 }

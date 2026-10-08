@@ -8,11 +8,16 @@ import { FolioMast } from "@/components/FolioMast";
 import { GraphSchematic } from "@/components/GraphSchematic";
 import { QuestionChip } from "@/components/QuestionCite";
 import { Talk } from "@/components/Talk";
+import { TileMap } from "@/components/TileMap";
 import { articleCopy, inspectCopy, neighborSentence } from "@/lib/articles";
 import { CATALOG, articleGround, folioGroundClass } from "@/lib/catalog";
 import { createClaim, retractChallenge, retractComment } from "@/lib/api";
 import { useActorSession } from "@/lib/useActorSession";
 import { wordFor } from "@/lib/reading";
+import {
+  observationPath,
+  researchTiles,
+} from "@/lib/research";
 import {
   graphOf,
   meaningClaim,
@@ -236,6 +241,14 @@ export function Article({ featureId }: { featureId: number }) {
           <p className="quiet">Loading the graph…</p>
         )}
       </section>
+      <section className="float-card is-map">
+        <TileMap
+          compact
+          tiles={researchTiles()}
+          selectedId={featureId}
+          path={observationPath(entry?.runId ?? 1)}
+        />
+      </section>
       <section className="float-card is-notes" aria-live="polite">
         <p className="kicker">Note</p>
         {notes}
@@ -247,6 +260,7 @@ export function Article({ featureId }: { featureId: number }) {
     return (
       <div className={folioClass}>
         <FolioMast
+          current="articles"
           actor={actor}
           onCreate={session ? handleCreate : undefined}
           onLeave={session ? leave : undefined}
@@ -284,7 +298,6 @@ export function Article({ featureId }: { featureId: number }) {
           onSession={setSession}
           onActor={become}
         />
-      )}
       )}
       <ClaimBody
         session={session}
@@ -328,6 +341,7 @@ export function Article({ featureId }: { featureId: number }) {
           featurePk={feature.id}
           actorId={actorId}
           onSession={setSession}
+          onBecome={become}
           onRetractComment={async (commentId) => {
             if (!actor) return;
             try {
