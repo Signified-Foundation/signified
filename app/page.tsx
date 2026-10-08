@@ -70,43 +70,14 @@ export default function Home() {
 
       <section className="front-hero">
         <div className="front-stage">
-          <h1 className="front-title">Signified</h1>
+          <h1 className="front-title">Why did the model say that?</h1>
           <p className="front-subtitle">
-            A wiki for understanding how AI models behave.
-          </p>
-          <p className="front-why">
-            Explore model responses, look at the evidence, and compare
-            explanations of what might be happening inside.
-          </p>
-          <p className="front-acts">
-            Explore{" "}
-            <span className="front-chip">
-              <img
-                src="/gallery-wall.jpg"
-                alt=""
-                className="is-observe"
-              />
-            </span>{" "}
-            compare{" "}
-            <span className="front-chip">
-              <img
-                src="/gallery-wall.jpg"
-                alt=""
-                className="is-interpret"
-              />
-            </span>{" "}
-            discuss{" "}
-            <span className="front-chip">
-              <img
-                src="/gallery-wall.jpg"
-                alt=""
-                className="is-debate"
-              />
-            </span>
+            Signified is a wiki about AI behavior. Read examples of what models
+            do, examine the evidence, and see how people explain the results.
           </p>
           <p className="front-doors">
             <Link href="/research" className="front-go">
-              Explore the wiki
+              Browse the wiki
             </Link>
           </p>
         </div>
@@ -174,7 +145,7 @@ export default function Home() {
             );
           })}
           <section className="shelf" aria-label="Open scorers on the Iliad pair">
-            <p className="shelf-label">Open scorers · same pair, no writing</p>
+            <p className="shelf-label">Model scores for the same text</p>
             <ul className="article-index score-index">
               {SCORES.map((score) => {
                 const model = MODELS.find((item) => item.id === score.model_id);
@@ -194,8 +165,7 @@ export default function Home() {
               })}
             </ul>
             <p className="shelf-note">
-              Not a measurement of the feature. Another open model scored the
-              written pair.
+              Each score shows how another model rates the same text pair.
             </p>
           </section>
         </div>
@@ -231,11 +201,11 @@ export default function Home() {
         </section>
 
         <section className="does-chapter" aria-labelledby="evidence-title">
-          <h2 id="evidence-title">What do the results mean?</h2>
+          <h2 id="evidence-title">How an explanation develops</h2>
           <p>
-            Measurements show what happened in a test. People propose
-            explanations for why. Signified keeps both together so you can
-            judge the evidence and see where people disagree.
+            Someone proposes an explanation for a model’s behavior. Others
+            can question it, suggest a test, or offer another explanation.
+            The entry records the results as the discussion develops.
           </p>
         </section>
 

@@ -1,8 +1,8 @@
 # Signified
 
-A wiki of contested readings of what happens inside models, and of how those readings meet public ones.
+Signified is a wiki about AI behavior. Read examples of what models do, examine the evidence, and see how people explain the results.
 
-Interpretations stay claims. Evidence stays numbers. Talk is for people, not proof. The article does not pick a winner. Graphs are made elsewhere (Colab / `circuit-tracer`); this site holds the argument.
+Each entry collects model responses, measurements, proposed explanations, and discussion. Contributors can question an explanation and suggest experiments to test it. Graphs are imported from Colab or `circuit-tracer`.
 
 Type: **Montaga** for titles and roman serif, **Newsreader** for italics. No mono.
 

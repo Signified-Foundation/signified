@@ -7,60 +7,59 @@ export default function MethodPage() {
       current="method"
       ground="field"
       toc={[
-        { href: "#loop", label: "The loop" },
-        { href: "#counts", label: "What counts" },
-        { href: "#not", label: "What we will not do" },
+        { href: "#loop", label: "Developing an explanation" },
+        { href: "#counts", label: "Recording evidence" },
+        { href: "#not", label: "Open questions" },
       ]}
     >
       <article className="article">
         <p className="kicker">Method</p>
-        <h1>How a reading is held</h1>
+        <h1>How the wiki works</h1>
         <p className="lede">
-          Questions are the outside view: what the model did. Features are the
-          inside view: what a unit might have been representing. The computer
-          measures. A person interprets. Another person may contest that
-          reading. A representation can be observed. What it signifies remains
-          something to be argued over.
+          Each entry starts with something a model did. It brings together the
+          prompt, the response, and any measurements of the model’s internal
+          activity. Contributors use these to propose and discuss explanations.
         </p>
 
-        <h2 id="loop">The loop</h2>
+        <h2 id="loop">Developing an explanation</h2>
         <p>
-          Observe, interpret, test, contest, revise. An attribution graph is an
-          observation, not a verdict. A human interpretation is a claim, not a
-          fact. A model-generated explanation is not evidence. A public view that
-          meets the model’s is still a reading, not a measurement.
+          A contributor writes a claim about what an internal feature might
+          represent. Other contributors can question it, offer another
+          explanation, or suggest an experiment. Results from those experiments
+          help people revise their claims.
         </p>
         <p>
-          People also vote on responses. That Choice is first-order: which
-          completion, among the writers of this lead. It does not move a
-          reading.{" "}
+          You can also vote for the response you prefer. Response votes record
+          preferences; claim votes record support for an explanation. Read about{" "}
           <Link href="/blog/dictionary" className="text-link">
-            The two votes
+            how voting works
           </Link>
-          {" "}are kept apart on purpose.
+          .
         </p>
 
-        <h2 id="counts">What counts</h2>
+        <h2 id="counts">Recording evidence</h2>
         <p>
-          Evidence is a numerical result from an experiment that was actually
-          run. Notes may accompany the number. They do not replace it.
-          Attribution is correlational until an intervention has been run. A
-          second writer on the same lead is not that intervention.{" "}
+          Evidence records a measured result and the experiment that produced
+          it. An attribution graph shows connections between internal activity
+          and the response. Testing whether a feature causes a change requires
+          an intervention: changing that feature and measuring the effect.
+          Read more about{" "}
           <Link href="/blog/interventions" className="text-link">
-            After the completion
+            testing model behavior
           </Link>
           .
         </p>
         <p>
-          Talk is for people. Community Notes is an agent: it adds context, not
-          evidence. A comment can disagree with a reading, or bring a public
-          view to the same unit. It still is not evidence.
+          The discussion holds questions, alternative explanations, and
+          relevant context. Community Notes adds context written by an AI
+          agent. Experiment results have their own place in the evidence list.
         </p>
 
-        <h2 id="not">What we will not do</h2>
+        <h2 id="not">Open questions</h2>
         <p>
-          The wiki will not complete the sentence “this feature represents…” for
-          you. It will not pick a winner when two readings remain.
+          Contributors write the explanations attached to each feature. When
+          several explanations remain plausible, the entry keeps them available
+          alongside the evidence and the tests people have suggested.
         </p>
 
         <p>
